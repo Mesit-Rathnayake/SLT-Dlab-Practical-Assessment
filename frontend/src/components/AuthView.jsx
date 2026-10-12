@@ -294,7 +294,7 @@ export default function AuthView({ onBackToHome, onSuccess }) {
                 <Crown size={15} color="#d97706" />
                 <div>
                   <strong>Super Admin</strong>
-                  <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>superadmin@...</div>
+                  <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>Hospital Director</div>
                 </div>
               </button>
 
@@ -307,7 +307,7 @@ export default function AuthView({ onBackToHome, onSuccess }) {
                 <Building size={15} color="#0284c7" />
                 <div>
                   <strong>General Admin</strong>
-                  <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>admin@...</div>
+                  <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>Front Desk & Admissions</div>
                 </div>
               </button>
 

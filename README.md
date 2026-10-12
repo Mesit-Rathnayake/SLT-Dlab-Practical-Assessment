@@ -70,14 +70,14 @@ The application provides three specialized role-based workspaces accessible via 
 
 > 📄 **Evaluation Reference**: Detailed credentials and NIC mapping are documented in [CREDENTIALS.txt](file:///d:/Education/INternship/SLT/Task%2001/CREDENTIALS.txt) and [CREDENTIALS.md](file:///d:/Education/INternship/SLT/Task%2001/CREDENTIALS.md).
 
-The system features an enterprise **Landing Page** and **Staff Sign In** dialog with **1-Click Workspace Switcher Buttons** for instant access without manual typing:
+The system enforces strict role-based authentication with a **Reviewer Quick-Fill Helper** on the sign-in screen to quickly populate fields for manual verification:
 
-| Role | Name | Email | Password | Features / Flow |
+| Role | Name & Title | Email | Password | Features / Flow |
 | :--- | :--- | :--- | :--- | :--- |
-| **Super Admin** | Dr. Arthur Kingsley | `superadmin@medwizard.health` | `SuperAdmin123!` | Doctor onboarding, SLMC verification, Working hours editor, Email outbox, Patient Records & History. |
-| **General Admin**| Sarah Miller | `admin@medwizard.health` | `Admin123!` | Appointments directory, NIC-based booking, emergency leave alert banner, Patient Registry & Medical History tab. |
-| **Doctor (Active)**| Dr. Eleanor Vance | `eleanor.vance@medwizard.health` | `DoctorPass123!` | Active Consultant Cardiologist workspace, consultation actions. |
-| **Doctor (Temp)** | Dr. Marcus Chen | `marcus.chen@medwizard.health` | `TempDr2026!` | **Enforced Password Security Workflow**: Prompts doctor to set a permanent password upon login! |
+| **Super Admin** | Arthur Kingsley *(Hospital Executive Director)* | `superadmin@medwizard.health` | `SuperAdmin123!` | Executive oversight, clinician onboarding, SLMC verification, duty roster management, email outbox, patient records. |
+| **General Admin**| Sarah Miller *(Front Desk & Admissions Officer)* | `admin@medwizard.health` | `Admin123!` | Outpatient reception, appointment scheduling, patient registration, NIC verification, emergency leave alert banner. |
+| **Doctor (Active)**| Dr. Eleanor Vance *(Consultant Cardiologist)* | `eleanor.vance@medwizard.health` | `DoctorPass123!` | Active clinical consultation queue, visit state progression, weekly availability customizer. |
+| **Doctor (Temp)** | Dr. Marcus Chen *(Orthopedic Surgeon)* | `marcus.chen@medwizard.health` | `TempDr2026!` | **Enforced Password Security Workflow**: Prompts clinician to rotate initial temporary password before accessing clinical suite. |
 
 > **Patient Record Management**: Patient registration is maintained internally by administrative staff using **National Identity Card (NIC)** numbers as the unique identifier. When booking an appointment, entering a patient's NIC automatically retrieves their consultation history and links the new visit.
 
@@ -313,4 +313,4 @@ Production Dockerfiles and configurations are ready:
 | `POST` | `/api/v1/doctor/schedule-changes`| Doctor Only | Broadcast emergency leave or altered clinic hours |
 
 ---
-*Developed for the Medical Wizard AI Engineering Practical Assessment.*
+*Medical Wizard — Enterprise Clinical Operations & Healthcare Information Platform.*

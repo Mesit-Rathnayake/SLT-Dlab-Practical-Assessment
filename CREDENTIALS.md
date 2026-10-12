@@ -8,12 +8,12 @@ Comprehensive credentials directory, role permissions, navigation guards, and Na
 
 All portal access requires explicit authentication. Reviewers can sign in using the credentials below:
 
-| Role / Account | Email Address | Password | Authorized Portals | Primary Capabilities |
-| :--- | :--- | :--- | :--- | :--- |
-| **Super Admin** | `superadmin@medwizard.health` | `SuperAdmin123!` | Super Admin, General Admin | Doctor onboarding with SLMC Reg No, temp password generation & outbox, weekly duty roster management, full patient medical history access |
-| **General Admin** | `admin@medwizard.health` | `Admin123!` | General Admin only | Appointments directory, NIC-based booking, emergency leave alert banners, patient registry & previous consultation logs |
-| **Doctor (Active)** | `eleanor.vance@medwizard.health` | `DoctorPass123!` | Doctor Portal only | Consultation queue, clinical status progression, doctor weekly schedule, emergency leave broadcast |
-| **Doctor (Temp Pass)** | `marcus.chen@medwizard.health` | `TempDr2026!` | Doctor Portal (after password change) | Enforced first-time password rotation security workflow |
+| Role / Account | Name & Non-Doctor Title | Email Address | Password | Authorized Portals | Primary Capabilities |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Super Admin** | Arthur Kingsley *(Hospital Executive Director)* | `superadmin@medwizard.health` | `SuperAdmin123!` | Super Admin, General Admin | Doctor onboarding with SLMC Reg No, temp password generation & outbox, weekly duty roster management, full patient medical history access |
+| **General Admin** | Sarah Miller *(Front Desk & Admissions Officer)* | `admin@medwizard.health` | `Admin123!` | General Admin only | Patient admissions & registration, appointments directory, NIC-based booking, emergency leave alerts, consultation logs |
+| **Doctor (Active)** | Dr. Eleanor Vance *(Consultant Cardiologist)* | `eleanor.vance@medwizard.health` | `DoctorPass123!` | Doctor Portal only | Consultation queue, clinical status progression, doctor weekly schedule, emergency leave broadcast |
+| **Doctor (Temp Pass)** | Dr. Marcus Chen *(Orthopedic Surgeon)* | `marcus.chen@medwizard.health` | `TempDr2026!` | Doctor Portal (after password change) | Enforced first-time password rotation security workflow |
 
 > **💡 Quick-Fill Helper:**  
 > On both the Sign In page and modal, a "Reviewer Quick-Fill" helper is available to instantly populate the email and password fields. Submitting the form executes real backend authentication via `/api/v1/auth/login` with bcrypt verification and JWT issuance.

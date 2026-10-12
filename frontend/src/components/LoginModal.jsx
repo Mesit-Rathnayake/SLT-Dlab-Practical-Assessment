@@ -119,7 +119,7 @@ export default function LoginModal({ isOpen, onClose }) {
                 <Crown size={14} color="#d97706" />
                 <div>
                   <strong>Super Admin</strong>
-                  <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>Full system oversight</div>
+                  <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>Hospital Director</div>
                 </div>
               </button>
 
@@ -132,7 +132,7 @@ export default function LoginModal({ isOpen, onClose }) {
                 <User size={14} color="#0284c7" />
                 <div>
                   <strong>General Admin</strong>
-                  <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>Appointments & Patients</div>
+                  <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>Front Desk & Admissions</div>
                 </div>
               </button>
 

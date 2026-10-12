@@ -304,8 +304,8 @@ func SeedData(db *sql.DB) error {
 
 		usersSQL := `
 		INSERT INTO users (name, email, password_hash, role, doctor_id, must_change_password) VALUES
-		('Dr. Arthur Kingsley', 'superadmin@medwizard.health', $1, 'SUPER_ADMIN', NULL, FALSE),
-		('Sarah Miller (Clinical Admin)', 'admin@medwizard.health', $2, 'ADMIN', NULL, FALSE),
+		('Arthur Kingsley (Hospital Executive Director)', 'superadmin@medwizard.health', $1, 'SUPER_ADMIN', NULL, FALSE),
+		('Sarah Miller (Front Desk & Admissions Officer)', 'admin@medwizard.health', $2, 'ADMIN', NULL, FALSE),
 		('Dr. Eleanor Vance', 'eleanor.vance@medwizard.health', $3, 'DOCTOR', $5, FALSE),
 		('Dr. Marcus Chen', 'marcus.chen@medwizard.health', $4, 'DOCTOR', $6, TRUE);
 		`
@@ -334,6 +334,10 @@ Medical Wizard Administration`)
 			"Welcome to Medical Wizard: Account Created & Temporary Password",
 			welcomeBody,
 		)
+	} else {
+		// Ensure Super Admin and General Admin names accurately represent non-doctor administration
+		_, _ = db.Exec("UPDATE users SET name = 'Arthur Kingsley (Hospital Executive Director)' WHERE email = 'superadmin@medwizard.health'")
+		_, _ = db.Exec("UPDATE users SET name = 'Sarah Miller (Front Desk & Admissions Officer)' WHERE email = 'admin@medwizard.health'")
 	}
 
 	// Seed Doctor Schedules (Monday-Friday 09:00-17:00)
