@@ -12,9 +12,11 @@ import {
   Edit,
   Save,
   Check,
-  Send
+  Send,
+  Users
 } from 'lucide-react';
 import { api } from '../services/api';
+import PatientRecordsView from './PatientRecordsView';
 
 const DAYS_OF_WEEK = [
   { id: 1, name: 'Monday' },
@@ -220,6 +222,14 @@ export default function SuperAdminPortal({ doctors, onRefreshDoctors, onAddToast
         >
           <Mail size={17} />
           <span>Email Outbox & Credential Dispatch</span>
+        </button>
+
+        <button
+          className={`btn ${activeTab === 'patients' ? 'btn-primary' : 'btn-secondary'}`}
+          onClick={() => setActiveTab('patients')}
+        >
+          <Users size={17} />
+          <span>Patient Records & Medical History</span>
         </button>
       </div>
 
@@ -539,6 +549,11 @@ export default function SuperAdminPortal({ doctors, onRefreshDoctors, onAddToast
             </div>
           )}
         </div>
+      )}
+
+      {/* TAB 4: PATIENT RECORDS & MEDICAL HISTORY */}
+      {activeTab === 'patients' && (
+        <PatientRecordsView onAddToast={onAddToast} />
       )}
 
       {/* REGISTER DOCTOR MODAL */}

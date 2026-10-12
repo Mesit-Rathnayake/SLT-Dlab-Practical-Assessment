@@ -3,6 +3,7 @@ import {
   Activity,
   Plus,
   Database,
+  ShieldCheck,
   Crown,
   Stethoscope,
   Building,
@@ -109,11 +110,11 @@ export default function Navbar({
 
         {/* Actions & Profile */}
         <div className="navbar-actions">
-          {/* PostgreSQL Status */}
-          <div className="live-badge" title="Neon Serverless Cloud PostgreSQL Active">
+          {/* Hospital Network Status */}
+          <div className="live-badge" title="Hospital Information Network Status">
             <span className="live-pulse" />
-            <Database size={13} />
-            <span>Neon Cloud Active</span>
+            <ShieldCheck size={13} color="#0d9488" />
+            <span>System Operational</span>
           </div>
 
           {/* User Account / Login Status */}

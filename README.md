@@ -66,19 +66,20 @@ The application provides three specialized role-based workspaces accessible via 
 
 ---
 
-## 3. Credentials for Evaluation & Testing
+## 3. Credentials & Access Directory
 
-> 📄 **Evaluation Documents**: Full details are also available in [CREDENTIALS.txt](file:///d:/Education/INternship/SLT/Task%2001/CREDENTIALS.txt) and [CREDENTIALS.md](file:///d:/Education/INternship/SLT/Task%2001/CREDENTIALS.md).
+> 📄 **Evaluation Reference**: Detailed credentials and NIC mapping are documented in [CREDENTIALS.txt](file:///d:/Education/INternship/SLT/Task%2001/CREDENTIALS.txt) and [CREDENTIALS.md](file:///d:/Education/INternship/SLT/Task%2001/CREDENTIALS.md).
 
-The system features a **Modern Landing Page** and dedicated **Login & Patient Registration** pages. Both the Landing Page and Auth Dialog include **1-Click Reviewer Demo Profile Buttons** for instant evaluation without typing:
+The system features an enterprise **Landing Page** and **Staff Sign In** dialog with **1-Click Workspace Switcher Buttons** for instant access without manual typing:
 
 | Role | Name | Email | Password | Features / Flow |
 | :--- | :--- | :--- | :--- | :--- |
-| **Super Admin** | Dr. Arthur Kingsley | `superadmin@medwizard.health` | `SuperAdmin123!` | Doctor onboarding, SLMC verification, Working hours editor, Email outbox. |
-| **General Admin**| Sarah Miller | `admin@medwizard.health` | `Admin123!` | Appointment directory, emergency leave alert banner, patient scheduling. |
+| **Super Admin** | Dr. Arthur Kingsley | `superadmin@medwizard.health` | `SuperAdmin123!` | Doctor onboarding, SLMC verification, Working hours editor, Email outbox, Patient Records & History. |
+| **General Admin**| Sarah Miller | `admin@medwizard.health` | `Admin123!` | Appointments directory, NIC-based booking, emergency leave alert banner, Patient Registry & Medical History tab. |
 | **Doctor (Active)**| Dr. Eleanor Vance | `eleanor.vance@medwizard.health` | `DoctorPass123!` | Active Consultant Cardiologist workspace, consultation actions. |
-| **Doctor (Temp)** | Dr. Marcus Chen | `marcus.chen@medwizard.health` | `TempDr2026!` | **Enforced Password Change**: Prompts doctor to set a permanent password upon login! |
-| **Patient** | Nuwan Perera | `nuwan.perera@test.com` | `TestPassword123!` | Patient registration via Landing Page -> "Register as Patient". |
+| **Doctor (Temp)** | Dr. Marcus Chen | `marcus.chen@medwizard.health` | `TempDr2026!` | **Enforced Password Security Workflow**: Prompts doctor to set a permanent password upon login! |
+
+> **Patient Record Management**: Patient registration is maintained internally by administrative staff using **National Identity Card (NIC)** numbers as the unique identifier. When booking an appointment, entering a patient's NIC automatically retrieves their consultation history and links the new visit.
 
 ---
 

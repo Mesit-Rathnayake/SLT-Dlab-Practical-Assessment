@@ -86,6 +86,8 @@ func main() {
 		v1.DELETE("/appointments/:id", apptHandler.DeleteAppointment)
 		v1.GET("/patients", patientHandler.GetPatients)
 		v1.POST("/patients", patientHandler.CreatePatient)
+		v1.GET("/patients/nic/:nic", patientHandler.GetPatientByNIC)
+		v1.GET("/patients/:id/history", patientHandler.GetPatientHistory)
 		v1.GET("/doctors", metaHandler.GetDoctors)
 		v1.GET("/appointment-types", metaHandler.GetAppointmentTypes)
 		v1.GET("/analytics/stats", apptHandler.GetDashboardStats)

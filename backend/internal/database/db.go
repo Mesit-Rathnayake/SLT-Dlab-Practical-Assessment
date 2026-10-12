@@ -85,14 +85,18 @@ func RunMigrations(db *sql.DB) error {
 	schema := `
 	CREATE TABLE IF NOT EXISTS patients (
 		id BIGSERIAL PRIMARY KEY,
+		nic VARCHAR(50) DEFAULT '',
 		name VARCHAR(150) NOT NULL,
-		email VARCHAR(150) NOT NULL UNIQUE,
+		email VARCHAR(150) NOT NULL,
 		phone VARCHAR(50) NOT NULL,
 		date_of_birth DATE,
 		gender VARCHAR(20) DEFAULT 'Unspecified',
 		created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
 		updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 	);
+
+	ALTER TABLE patients ADD COLUMN IF NOT EXISTS nic VARCHAR(50) DEFAULT '';
+	CREATE UNIQUE INDEX IF NOT EXISTS idx_patients_nic ON patients(nic) WHERE nic != '' AND nic IS NOT NULL;
 
 	CREATE TABLE IF NOT EXISTS doctors (
 		id BIGSERIAL PRIMARY KEY,
@@ -258,17 +262,26 @@ func SeedData(db *sql.DB) error {
 	if patientCount == 0 {
 		log.Println("Seeding fictional patients...")
 		patientsSQL := `
-		INSERT INTO patients (name, email, phone, date_of_birth, gender) VALUES
-		('James Wilson', 'james.wilson@example.com', '+1 (555) 890-1234', '1988-04-12', 'Male'),
-		('Sophia Martinez', 'sophia.martinez@example.com', '+1 (555) 901-2345', '1995-09-23', 'Female'),
-		('Liam Johnson', 'liam.johnson@example.com', '+1 (555) 012-3456', '2012-11-05', 'Male'),
-		('Olivia Davis', 'olivia.davis@example.com', '+1 (555) 123-4567', '1974-02-18', 'Female'),
-		('Alexander Wright', 'alex.wright@example.com', '+1 (555) 234-8765', '1982-07-30', 'Male'),
-		('Emma Watson', 'emma.watson@example.com', '+1 (555) 345-9876', '1990-12-15', 'Female');
+		INSERT INTO patients (nic, name, email, phone, date_of_birth, gender) VALUES
+		('198810502341', 'James Wilson', 'james.wilson@example.com', '+1 (555) 890-1234', '1988-04-12', 'Male'),
+		('199578201945', 'Sophia Martinez', 'sophia.martinez@example.com', '+1 (555) 901-2345', '1995-09-23', 'Female'),
+		('201231005829', 'Liam Johnson', 'liam.johnson@example.com', '+1 (555) 012-3456', '2012-11-05', 'Male'),
+		('197451904321', 'Olivia Davis', 'olivia.davis@example.com', '+1 (555) 123-4567', '1974-02-18', 'Female'),
+		('198221203456', 'Alexander Wright', 'alex.wright@example.com', '+1 (555) 234-8765', '1982-07-30', 'Male'),
+		('199084601289', 'Emma Watson', 'emma.watson@example.com', '+1 (555) 345-9876', '1990-12-15', 'Female');
 		`
 		if _, err := db.Exec(patientsSQL); err != nil {
 			return err
 		}
+	} else {
+		// Backfill NICs if empty
+		_, _ = db.Exec("UPDATE patients SET nic = '198810502341' WHERE email = 'james.wilson@example.com' AND (nic = '' OR nic IS NULL)")
+		_, _ = db.Exec("UPDATE patients SET nic = '199578201945' WHERE email = 'sophia.martinez@example.com' AND (nic = '' OR nic IS NULL)")
+		_, _ = db.Exec("UPDATE patients SET nic = '201231005829' WHERE email = 'liam.johnson@example.com' AND (nic = '' OR nic IS NULL)")
+		_, _ = db.Exec("UPDATE patients SET nic = '197451904321' WHERE email = 'olivia.davis@example.com' AND (nic = '' OR nic IS NULL)")
+		_, _ = db.Exec("UPDATE patients SET nic = '198221203456' WHERE email = 'alex.wright@example.com' AND (nic = '' OR nic IS NULL)")
+		_, _ = db.Exec("UPDATE patients SET nic = '199084601289' WHERE email = 'emma.watson@example.com' AND (nic = '' OR nic IS NULL)")
+		_, _ = db.Exec("UPDATE patients SET nic = '199214502834' WHERE email = 'nuwan.perera@test.com' AND (nic = '' OR nic IS NULL)")
 	}
 
 	// Seed RBAC Users

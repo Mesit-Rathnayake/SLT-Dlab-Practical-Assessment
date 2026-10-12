@@ -40,7 +40,7 @@ func (r *AppointmentRepository) GetAll(params models.AppointmentFilterParams) (*
 
 	if strings.TrimSpace(params.Search) != "" {
 		searchTerm := "%" + strings.ToLower(strings.TrimSpace(params.Search)) + "%"
-		whereClauses = append(whereClauses, fmt.Sprintf("(LOWER(p.name) LIKE $%d OR LOWER(d.name) LIKE $%d OR LOWER(a.notes) LIKE $%d OR LOWER(t.name) LIKE $%d)", argIdx, argIdx, argIdx, argIdx))
+		whereClauses = append(whereClauses, fmt.Sprintf("(LOWER(p.name) LIKE $%d OR LOWER(COALESCE(p.nic, '')) LIKE $%d OR LOWER(d.name) LIKE $%d OR LOWER(a.notes) LIKE $%d OR LOWER(t.name) LIKE $%d)", argIdx, argIdx, argIdx, argIdx, argIdx))
 		args = append(args, searchTerm)
 		argIdx++
 	}
@@ -126,13 +126,14 @@ func (r *AppointmentRepository) GetAll(params models.AppointmentFilterParams) (*
 	selectQuery := fmt.Sprintf(`
 	SELECT 
 		a.id, a.patient_id, a.doctor_id, a.appointment_type_id, a.appointment_date_time, a.duration_minutes, a.status, a.notes, a.created_at, a.updated_at,
-		p.id, p.name, p.email, p.phone, TO_CHAR(p.date_of_birth, 'YYYY-MM-DD'), p.gender, p.created_at, p.updated_at,
+		p.id, COALESCE(p.nic, ''), p.name, p.email, p.phone, TO_CHAR(p.date_of_birth, 'YYYY-MM-DD'), p.gender, p.created_at, p.updated_at,
 		d.id, d.name, d.specialty, d.email, d.phone, d.room_number, d.created_at, d.updated_at,
 		t.id, t.name, t.description, t.default_duration_minutes, t.created_at
-	%s %s
-	ORDER BY %s
+	%%s %%s
+	ORDER BY %%s
 	LIMIT $%d OFFSET $%d
-	`, baseQuery, whereSQL, orderBy, argIdx, argIdx+1)
+	`, argIdx, argIdx+1)
+	selectQuery = fmt.Sprintf(selectQuery, baseQuery, whereSQL, orderBy)
 
 	args = append(args, limit, offset)
 
@@ -152,7 +153,7 @@ func (r *AppointmentRepository) GetAll(params models.AppointmentFilterParams) (*
 
 		err := rows.Scan(
 			&a.ID, &a.PatientID, &a.DoctorID, &a.AppointmentTypeID, &a.AppointmentDateTime, &a.DurationMinutes, &a.Status, &a.Notes, &a.CreatedAt, &a.UpdatedAt,
-			&p.ID, &p.Name, &p.Email, &p.Phone, &patientDOB, &p.Gender, &p.CreatedAt, &p.UpdatedAt,
+			&p.ID, &p.NIC, &p.Name, &p.Email, &p.Phone, &patientDOB, &p.Gender, &p.CreatedAt, &p.UpdatedAt,
 			&d.ID, &d.Name, &d.Specialty, &d.Email, &d.Phone, &d.RoomNumber, &d.CreatedAt, &d.UpdatedAt,
 			&t.ID, &t.Name, &t.Description, &t.DefaultDurationMinutes, &t.CreatedAt,
 		)
@@ -189,7 +190,7 @@ func (r *AppointmentRepository) GetByID(id int64) (*models.Appointment, error) {
 	query := `
 	SELECT 
 		a.id, a.patient_id, a.doctor_id, a.appointment_type_id, a.appointment_date_time, a.duration_minutes, a.status, a.notes, a.created_at, a.updated_at,
-		p.id, p.name, p.email, p.phone, TO_CHAR(p.date_of_birth, 'YYYY-MM-DD'), p.gender, p.created_at, p.updated_at,
+		p.id, COALESCE(p.nic, ''), p.name, p.email, p.phone, TO_CHAR(p.date_of_birth, 'YYYY-MM-DD'), p.gender, p.created_at, p.updated_at,
 		d.id, d.name, d.specialty, d.email, d.phone, d.room_number, d.created_at, d.updated_at,
 		t.id, t.name, t.description, t.default_duration_minutes, t.created_at
 	FROM appointments a
@@ -207,7 +208,7 @@ func (r *AppointmentRepository) GetByID(id int64) (*models.Appointment, error) {
 
 	err := r.db.QueryRow(query, id).Scan(
 		&a.ID, &a.PatientID, &a.DoctorID, &a.AppointmentTypeID, &a.AppointmentDateTime, &a.DurationMinutes, &a.Status, &a.Notes, &a.CreatedAt, &a.UpdatedAt,
-		&p.ID, &p.Name, &p.Email, &p.Phone, &patientDOB, &p.Gender, &p.CreatedAt, &p.UpdatedAt,
+		&p.ID, &p.NIC, &p.Name, &p.Email, &p.Phone, &patientDOB, &p.Gender, &p.CreatedAt, &p.UpdatedAt,
 		&d.ID, &d.Name, &d.Specialty, &d.Email, &d.Phone, &d.RoomNumber, &d.CreatedAt, &d.UpdatedAt,
 		&t.ID, &t.Name, &t.Description, &t.DefaultDurationMinutes, &t.CreatedAt,
 	)

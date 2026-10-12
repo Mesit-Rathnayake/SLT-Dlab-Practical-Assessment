@@ -82,13 +82,24 @@ func parseDateTime(raw string) (time.Time, error) {
 func (s *AppointmentService) CreateAppointment(req models.CreateAppointmentRequest) (*models.Appointment, error) {
 	// 1. Determine or create patient
 	var patientID int64
-	if req.PatientID != nil && *req.PatientID > 0 {
+	cleanNIC := strings.TrimSpace(req.PatientNIC)
+
+	if cleanNIC != "" {
+		existingByNIC, err := s.patientRepo.GetByNIC(cleanNIC)
+		if err == nil && existingByNIC != nil {
+			patientID = existingByNIC.ID
+		}
+	}
+
+	if patientID == 0 && req.PatientID != nil && *req.PatientID > 0 {
 		patientID = *req.PatientID
 		patient, err := s.patientRepo.GetByID(patientID)
 		if err != nil || patient == nil {
 			return nil, fmt.Errorf("patient with ID %d not found", patientID)
 		}
-	} else if strings.TrimSpace(req.PatientName) != "" {
+	}
+
+	if patientID == 0 && strings.TrimSpace(req.PatientName) != "" {
 		email := strings.TrimSpace(req.PatientEmail)
 		if email == "" {
 			email = strings.ToLower(strings.ReplaceAll(req.PatientName, " ", ".")) + fmt.Sprintf(".%d@medwizard.local", time.Now().Unix())
@@ -97,18 +108,30 @@ func (s *AppointmentService) CreateAppointment(req models.CreateAppointmentReque
 		if phone == "" {
 			phone = "Not provided"
 		}
+		gender := strings.TrimSpace(req.PatientGender)
+		if gender == "" {
+			gender = "Unspecified"
+		}
+		var dob *string
+		if strings.TrimSpace(req.PatientDOB) != "" {
+			val := strings.TrimSpace(req.PatientDOB)
+			dob = &val
+		}
+
 		newPatient := &models.Patient{
-			Name:   strings.TrimSpace(req.PatientName),
-			Email:  email,
-			Phone:  phone,
-			Gender: "Unspecified",
+			NIC:         cleanNIC,
+			Name:        strings.TrimSpace(req.PatientName),
+			Email:       email,
+			Phone:       phone,
+			Gender:      gender,
+			DateOfBirth: dob,
 		}
 		createdPatient, err := s.patientRepo.Create(newPatient)
 		if err != nil {
 			return nil, fmt.Errorf("failed to create new patient: %w", err)
 		}
 		patientID = createdPatient.ID
-	} else {
+	} else if patientID == 0 {
 		return nil, ErrMissingPatient
 	}
 

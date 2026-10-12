@@ -26,9 +26,10 @@ type User struct {
 	Doctor *Doctor `json:"doctor,omitempty"`
 }
 
-// Patient represents a registered patient
+// Patient represents a registered patient with national identity card (NIC)
 type Patient struct {
 	ID          int64     `json:"id"`
+	NIC         string    `json:"nic"`
 	Name        string    `json:"name"`
 	Email       string    `json:"email"`
 	Phone       string    `json:"phone"`
@@ -36,6 +37,12 @@ type Patient struct {
 	Gender      string    `json:"gender"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
+}
+
+// PatientHistoryResponse encapsulates patient profile and chronological appointment history
+type PatientHistoryResponse struct {
+	Patient      Patient       `json:"patient"`
+	Appointments []Appointment `json:"appointments"`
 }
 
 // Doctor represents a healthcare provider with clinical details
@@ -165,9 +172,12 @@ type RegisterDoctorAccountRequest struct {
 // CreateAppointmentRequest
 type CreateAppointmentRequest struct {
 	PatientID           *int64 `json:"patient_id"`
+	PatientNIC          string `json:"patient_nic"`
 	PatientName         string `json:"patient_name"`
 	PatientEmail        string `json:"patient_email"`
 	PatientPhone        string `json:"patient_phone"`
+	PatientGender       string `json:"patient_gender"`
+	PatientDOB          string `json:"patient_dob"`
 	DoctorID            int64  `json:"doctor_id" binding:"required"`
 	AppointmentTypeID   int64  `json:"appointment_type_id" binding:"required"`
 	AppointmentDateTime string `json:"appointment_date_time" binding:"required"`

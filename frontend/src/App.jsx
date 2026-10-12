@@ -12,16 +12,19 @@ import LoginModal from './components/LoginModal';
 import ForceChangePasswordModal from './components/ForceChangePasswordModal';
 import LandingPage from './components/LandingPage';
 import AuthView from './components/AuthView';
+import PatientRecordsView from './components/PatientRecordsView';
 import Toast from './components/Toast';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { api } from './services/api';
+import { Calendar, Users } from 'lucide-react';
 
 function MainApplication() {
   const { user, portalMode, setPortalMode, quickDemoLogin } = useAuth();
 
   // Navigation View: 'landing' | 'auth' | 'app'
   const [currentView, setCurrentView] = useState('landing');
-  const [authMode, setAuthMode] = useState('login'); // 'login' | 'signup'
+  const [authMode, setAuthMode] = useState('login');
+  const [adminTab, setAdminTab] = useState('appointments'); // 'appointments' | 'patients'
 
   // Core Data
   const [appointments, setAppointments] = useState([]);
@@ -294,57 +297,102 @@ function MainApplication() {
               onAcknowledge={handleAcknowledgeAlert}
             />
 
-            {/* KPI Stats */}
-            <StatsCards
-              stats={stats}
-              activeStatus={filters.status}
-              onSelectStatus={(status) => handleFilterChange('status', status)}
-            />
-
-            {/* Section Header */}
-            <div className="section-header">
-              <div className="section-title">
-                <h2>General Administration & Appointments Directory</h2>
-                <p>Monitor, book, and coordinate hospital appointments across all clinicians.</p>
-              </div>
+            {/* Admin Tabs: Appointments Directory vs Patient Records */}
+            <div
+              style={{
+                display: 'flex',
+                gap: '0.6rem',
+                marginBottom: '1.25rem',
+                borderBottom: '1px solid var(--border-subtle)',
+                paddingBottom: '0.75rem',
+                flexWrap: 'wrap',
+              }}
+            >
               <button
-                id="btn-schedule-main"
-                className="btn btn-primary"
-                onClick={() =>
-                  setModalState({ isOpen: true, mode: 'create', appointment: null })
-                }
+                className={`btn ${adminTab === 'appointments' ? 'btn-primary' : 'btn-secondary'}`}
+                onClick={() => setAdminTab('appointments')}
+                style={{ fontSize: '0.8125rem' }}
               >
-                + Schedule Appointment
+                <Calendar size={15} />
+                <span>Appointments Directory</span>
+              </button>
+
+              <button
+                className={`btn ${adminTab === 'patients' ? 'btn-primary' : 'btn-secondary'}`}
+                onClick={() => setAdminTab('patients')}
+                style={{ fontSize: '0.8125rem' }}
+              >
+                <Users size={15} />
+                <span>Patient Records & Medical History</span>
               </button>
             </div>
 
-            {/* Search & Filters */}
-            <FiltersBar
-              filters={filters}
-              onFilterChange={handleFilterChange}
-              onResetFilters={handleResetFilters}
-              doctors={doctors}
-              appointmentTypes={appointmentTypes}
-              stats={stats}
-            />
+            {adminTab === 'appointments' ? (
+              <div>
+                {/* KPI Stats */}
+                <StatsCards
+                  stats={stats}
+                  activeStatus={filters.status}
+                  onSelectStatus={(status) => handleFilterChange('status', status)}
+                />
 
-            {/* Appointments Table */}
-            <AppointmentsTable
-              appointments={appointments}
-              loading={loading}
-              pagination={pagination}
-              onPageChange={handlePageChange}
-              onEdit={(appt) =>
-                setModalState({ isOpen: true, mode: 'edit', appointment: appt })
-              }
-              onDelete={(appt) =>
-                setDeleteModalState({ isOpen: true, appointment: appt, deleting: false })
-              }
-              onOpenNewModal={() =>
-                setModalState({ isOpen: true, mode: 'create', appointment: null })
-              }
-              onStatusChange={handleQuickStatusChange}
-            />
+                {/* Section Header */}
+                <div className="section-header">
+                  <div className="section-title">
+                    <h2>General Administration & Appointments Directory</h2>
+                    <p>Monitor, book, and coordinate hospital appointments across all clinicians.</p>
+                  </div>
+                  <button
+                    id="btn-schedule-main"
+                    className="btn btn-primary"
+                    onClick={() =>
+                      setModalState({ isOpen: true, mode: 'create', appointment: null })
+                    }
+                  >
+                    + Schedule Appointment
+                  </button>
+                </div>
+
+                {/* Search & Filters */}
+                <FiltersBar
+                  filters={filters}
+                  onFilterChange={handleFilterChange}
+                  onResetFilters={handleResetFilters}
+                  doctors={doctors}
+                  appointmentTypes={appointmentTypes}
+                  stats={stats}
+                />
+
+                {/* Appointments Table */}
+                <AppointmentsTable
+                  appointments={appointments}
+                  loading={loading}
+                  pagination={pagination}
+                  onPageChange={handlePageChange}
+                  onEdit={(appt) =>
+                    setModalState({ isOpen: true, mode: 'edit', appointment: appt })
+                  }
+                  onDelete={(appt) =>
+                    setDeleteModalState({ isOpen: true, appointment: appt, deleting: false })
+                  }
+                  onOpenNewModal={() =>
+                    setModalState({ isOpen: true, mode: 'create', appointment: null })
+                  }
+                  onStatusChange={handleQuickStatusChange}
+                />
+              </div>
+            ) : (
+              <PatientRecordsView
+                onScheduleForPatient={(pat) => {
+                  setModalState({
+                    isOpen: true,
+                    mode: 'create',
+                    appointment: { patient_id: pat.id, patient: pat },
+                  });
+                }}
+                onAddToast={addToast}
+              />
+            )}
           </div>
         )}
       </main>

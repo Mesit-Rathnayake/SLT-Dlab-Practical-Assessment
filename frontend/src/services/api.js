@@ -93,6 +93,12 @@ export const api = {
   getPatients: (search = '') =>
     request(`/patients${search ? `?search=${encodeURIComponent(search)}` : ''}`),
 
+  getPatientByNIC: (nic) =>
+    request(`/patients/nic/${encodeURIComponent(nic)}`),
+
+  getPatientHistory: (patientId) =>
+    request(`/patients/${patientId}/history`),
+
   createPatient: (payload) =>
     request('/patients', {
       method: 'POST',

@@ -13,21 +13,22 @@ import {
   Lock,
   Sparkles,
   CheckCircle2,
-  AlertTriangle
+  AlertTriangle,
+  History,
+  FileText
 } from 'lucide-react';
 
 export default function LandingPage({
   onEnterApp,
   onOpenAuth,
   onQuickDemo,
-  isDbConnected
 }) {
   return (
     <div style={{ minHeight: '100vh', background: '#f8fafc', color: '#0f172a' }}>
       {/* Landing Header */}
       <header
         style={{
-          background: 'rgba(255, 255, 255, 0.9)',
+          background: 'rgba(255, 255, 255, 0.95)',
           backdropFilter: 'blur(10px)',
           borderBottom: '1px solid var(--border-subtle)',
           position: 'sticky',
@@ -66,16 +67,16 @@ export default function LandingPage({
                 Medical Wizard
               </span>
               <span style={{ display: 'block', fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 600 }}>
-                Enterprise Clinical System
+                Hospital Information & Clinical Management System
               </span>
             </div>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <div className="live-badge" title="Live Database Status">
+            <div className="live-badge" title="Hospital Network Status">
               <span className="live-pulse" />
-              <Database size={13} />
-              <span>Neon Cloud Active</span>
+              <ShieldCheck size={14} color="#0d9488" />
+              <span>System Operational</span>
             </div>
 
             <button
@@ -84,7 +85,7 @@ export default function LandingPage({
               style={{ fontSize: '0.8125rem', padding: '0.5rem 1rem' }}
               onClick={() => onOpenAuth('login')}
             >
-              Sign In
+              Staff Sign In
             </button>
 
             <button
@@ -93,7 +94,7 @@ export default function LandingPage({
               style={{ fontSize: '0.8125rem', padding: '0.5rem 1.15rem' }}
               onClick={onEnterApp}
             >
-              <span>Access System</span>
+              <span>Launch Clinical Portal</span>
               <ArrowRight size={15} />
             </button>
           </div>
@@ -125,8 +126,8 @@ export default function LandingPage({
             boxShadow: 'var(--shadow-sm)',
           }}
         >
-          <Sparkles size={15} />
-          <span>Practical Assessment • AI Engineering Intern</span>
+          <Building size={15} />
+          <span>Integrated Healthcare System • NIC Patient Tracking</span>
         </div>
 
         <h1
@@ -140,7 +141,7 @@ export default function LandingPage({
             margin: '0 auto 1.25rem',
           }}
         >
-          Next-Generation Clinical Appointment & Multi-Portal Administration
+          Enterprise Clinical Appointments & Comprehensive Patient Records
         </h1>
 
         <p
@@ -153,7 +154,7 @@ export default function LandingPage({
           }}
         >
           A unified, high-performance healthcare management platform built with <strong>React</strong>,{' '}
-          <strong>Go (Golang)</strong>, and <strong>Neon Serverless PostgreSQL</strong>. Enforces relational data integrity, verified SLMC practitioner onboarding, and instant sudden leave alerts.
+          <strong>Go (Golang)</strong>, and secure relational database architecture. Features National Identity Card (NIC) patient tracking, complete consultation histories, verified practitioner rosters, and real-time emergency leave alerts.
         </p>
 
         {/* Hero CTAs */}
@@ -173,18 +174,18 @@ export default function LandingPage({
             style={{ fontSize: '1rem', padding: '0.85rem 1.75rem', borderRadius: '12px' }}
             onClick={onEnterApp}
           >
-            <span>Launch Administration Portal</span>
+            <span>Access Hospital System</span>
             <ArrowRight size={18} />
           </button>
 
           <button
-            id="hero-btn-signup"
+            id="hero-btn-login"
             className="btn btn-secondary"
             style={{ fontSize: '1rem', padding: '0.85rem 1.75rem', borderRadius: '12px' }}
-            onClick={() => onOpenAuth('signup')}
+            onClick={() => onOpenAuth('login')}
           >
-            <Users size={18} />
-            <span>Register as Patient</span>
+            <Lock size={16} />
+            <span>Authorized Staff Sign In</span>
           </button>
         </div>
 
@@ -210,7 +211,7 @@ export default function LandingPage({
               letterSpacing: '0.05em',
             }}
           >
-            ⚡ Reviewer Quick-Access Profiles (1-Click Instant Login)
+            ⚡ Hospital Staff Workspaces (1-Click Instant Login)
           </div>
 
           <div
@@ -228,7 +229,7 @@ export default function LandingPage({
               <Crown size={16} color="#d97706" />
               <div>
                 <strong style={{ fontSize: '0.8125rem' }}>Super Admin</strong>
-                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Onboard Doctors & SLMC</div>
+                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Doctor & Hours Mgmt</div>
               </div>
             </button>
 
@@ -239,8 +240,8 @@ export default function LandingPage({
             >
               <Building size={16} color="#0284c7" />
               <div>
-                <strong style={{ fontSize: '0.8125rem' }}>General Admin</strong>
-                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Hospital Appointments</div>
+                <strong style={{ fontSize: '0.8125rem' }}>General Administration</strong>
+                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Appointments & Patient Records</div>
               </div>
             </button>
 
@@ -251,34 +252,34 @@ export default function LandingPage({
             >
               <Stethoscope size={16} color="#0d9488" />
               <div>
-                <strong style={{ fontSize: '0.8125rem' }}>Dr. Vance</strong>
-                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Cardiologist Workspace</div>
+                <strong style={{ fontSize: '0.8125rem' }}>Dr. Vance (Cardiology)</strong>
+                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Consultation Queue & Status</div>
               </div>
             </button>
 
             <button
               className="btn btn-secondary"
-              style={{ justifyContent: 'flex-start', padding: '0.65rem', textAlign: 'left', background: '#fffbeb', borderColor: '#fde68a' }}
+              style={{ justifyContent: 'flex-start', padding: '0.65rem', textAlign: 'left' }}
               onClick={() => onQuickDemo('doctor_temp')}
             >
-              <Lock size={16} color="#b45309" />
+              <ShieldCheck size={16} color="#dc2626" />
               <div>
-                <strong style={{ fontSize: '0.8125rem' }}>Dr. Chen (Temp)</strong>
-                <div style={{ fontSize: '0.7rem', color: '#b45309' }}>Test Password Rotation</div>
+                <strong style={{ fontSize: '0.8125rem' }}>Dr. Chen (Onboarding)</strong>
+                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Enforced Password Security</div>
               </div>
             </button>
           </div>
         </div>
       </section>
 
-      {/* Feature Pillars */}
-      <section style={{ maxWidth: '1280px', margin: '4rem auto', padding: '0 2rem' }}>
-        <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
-          <h2 style={{ fontSize: '1.875rem', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.02em' }}>
-            Three Dedicated Role-Based Workspaces
+      {/* Feature Highlights Section */}
+      <section style={{ maxWidth: '1280px', margin: '0 auto', padding: '3rem 2rem 5rem' }}>
+        <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
+          <h2 style={{ fontSize: '2rem', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.02em' }}>
+            Built for High-Reliability Hospital Operations
           </h2>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.9375rem' }}>
-            Tailored interfaces designed specifically for administrators, clinicians, and reception staff.
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', maxWidth: '600px', margin: '0.5rem auto 0' }}>
+            Seamless integration between clinical staff, supervising administrators, and healthcare providers.
           </p>
         </div>
 
@@ -312,17 +313,17 @@ export default function LandingPage({
             </div>
             <h3 style={{ fontSize: '1.25rem', fontWeight: 700 }}>General Administration Portal</h3>
             <p style={{ color: '#64748b', fontSize: '0.875rem', lineHeight: 1.6 }}>
-              Comprehensive appointment booking, multi-criteria filtering, live debounced search, and immediate awareness of sudden doctor schedule adjustments via broadcast banners.
+              Comprehensive appointment booking with National Identity Card (NIC) verification, complete previous medical consultation history tracking, and doctor emergency leave broadcast banners.
             </p>
-            <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.5rem', fontSize: '0.8125rem', color: '#334155' }}>
+            <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.5rem', fontSize: '0.8125rem', color: '#334155', padding: 0 }}>
               <li style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <CheckCircle2 size={16} color="#0d9488" /> Doctor conflict & double-booking prevention
+                <CheckCircle2 size={16} color="#0d9488" /> NIC primary key verification & past visit history
               </li>
               <li style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <CheckCircle2 size={16} color="#0d9488" /> Real-time search across patients & notes
+                <CheckCircle2 size={16} color="#0d9488" /> Real-time search across patients, doctors & notes
               </li>
               <li style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <CheckCircle2 size={16} color="#0d9488" /> Emergency leave alert acknowledgment
+                <CheckCircle2 size={16} color="#0d9488" /> Instant sudden leave & schedule alert banner
               </li>
             </ul>
           </div>
@@ -356,9 +357,9 @@ export default function LandingPage({
             </div>
             <h3 style={{ fontSize: '1.25rem', fontWeight: 700 }}>Super Admin Portal</h3>
             <p style={{ color: '#64748b', fontSize: '0.875rem', lineHeight: 1.6 }}>
-              Physician onboarding with Sri Lanka Medical Council (SLMC) registration verification, automated temporary credential issuance, recurring duty hours customizer, and email outbox audit.
+              Physician onboarding with Sri Lanka Medical Council (SLMC) registration verification, automated temporary credential issuance, recurring duty hours customizer, and full patient medical record access.
             </p>
-            <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.5rem', fontSize: '0.8125rem', color: '#334155' }}>
+            <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.5rem', fontSize: '0.8125rem', color: '#334155', padding: 0 }}>
               <li style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <CheckCircle2 size={16} color="#d97706" /> Practitioner onboarding with SLMC Reg No
               </li>
@@ -366,7 +367,7 @@ export default function LandingPage({
                 <CheckCircle2 size={16} color="#d97706" /> Weekly schedule & slot duration customizer
               </li>
               <li style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <CheckCircle2 size={16} color="#d97706" /> Transactional mailer outbox audit trail
+                <CheckCircle2 size={16} color="#d97706" /> Patient registry with chronological histories
               </li>
             </ul>
           </div>
@@ -400,9 +401,9 @@ export default function LandingPage({
             </div>
             <h3 style={{ fontSize: '1.25rem', fontWeight: 700 }}>Personalized Doctor Portal</h3>
             <p style={{ color: '#64748b', fontSize: '0.875rem', lineHeight: 1.6 }}>
-              Clinician consultation workspace showing daily patient appointments, inline visit progression (Start Consultation $\to$ Mark Completed), duty schedule management, and emergency leave reporting.
+              Clinician consultation workspace showing daily patient appointments, inline visit progression (Start Consultation ➔ Mark Completed), duty schedule management, and emergency leave reporting.
             </p>
-            <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.5rem', fontSize: '0.8125rem', color: '#334155' }}>
+            <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.5rem', fontSize: '0.8125rem', color: '#334155', padding: 0 }}>
               <li style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <CheckCircle2 size={16} color="#0f766e" /> Dedicated consultation roster & patient history
               </li>
@@ -434,10 +435,10 @@ export default function LandingPage({
             <strong style={{ color: '#0f172a' }}>Medical Wizard Clinical Management System</strong>
           </div>
           <div>
-            Built with <strong>React</strong> • <strong>Go</strong> • <strong>Neon PostgreSQL Cloud</strong> • <strong>Docker</strong>
+            Built with <strong>React</strong> • <strong>Go</strong> • <strong>PostgreSQL</strong>
           </div>
           <div>
-            AI Engineering Intern Assessment • Candidate: <strong>Rathnayake</strong>
+            Enterprise Hospital Information Platform
           </div>
         </div>
       </footer>
