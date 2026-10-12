@@ -1,0 +1,26 @@
+# Environment variables (Crucial: Protects Neon DB passwords)
+.env
+backend/.env
+backend/.env.local
+*.env
+
+# Dependencies
+node_modules/
+backend/bin/
+
+# Production builds
+dist/
+dist-ssr/
+*.local
+
+# Editor & System files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

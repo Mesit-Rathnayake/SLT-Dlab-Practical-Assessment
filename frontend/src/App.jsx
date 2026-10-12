@@ -5,19 +5,28 @@ import FiltersBar from './components/FiltersBar';
 import AppointmentsTable from './components/AppointmentsTable';
 import AppointmentModal from './components/AppointmentModal';
 import DeleteConfirmModal from './components/DeleteConfirmModal';
+import SuperAdminPortal from './components/SuperAdminPortal';
+import DoctorPortal from './components/DoctorPortal';
+import AdminScheduleAlertsBanner from './components/AdminScheduleAlertsBanner';
+import LoginModal from './components/LoginModal';
+import ForceChangePasswordModal from './components/ForceChangePasswordModal';
 import Toast from './components/Toast';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import { api } from './services/api';
 
-export default function App() {
-  // Global Data
+function MainApplication() {
+  const { user, portalMode, setPortalMode } = useAuth();
+
+  // Core Data
   const [appointments, setAppointments] = useState([]);
   const [stats, setStats] = useState(null);
   const [patients, setPatients] = useState([]);
   const [doctors, setDoctors] = useState([]);
   const [appointmentTypes, setAppointmentTypes] = useState([]);
+  const [scheduleAlerts, setScheduleAlerts] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Filters & Pagination
+  // Filters & Pagination for General Admin
   const [filters, setFilters] = useState({
     search: '',
     status: 'all',
@@ -37,6 +46,7 @@ export default function App() {
   });
 
   // Modals & Notifications
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [modalState, setModalState] = useState({
     isOpen: false,
     mode: 'create',
@@ -64,19 +74,21 @@ export default function App() {
     setToasts((prev) => prev.filter((t) => t.id !== id));
   };
 
-  // Initial Data Fetch (Metadata)
+  // Initial Data Fetch
   const fetchMetadata = async () => {
     try {
-      const [docsData, typesData, patsData, statsData] = await Promise.all([
+      const [docsData, typesData, patsData, statsData, alertsData] = await Promise.all([
         api.getDoctors(),
         api.getAppointmentTypes(),
         api.getPatients(),
         api.getStats(),
+        api.getScheduleChanges().catch(() => []),
       ]);
       setDoctors(docsData || []);
       setAppointmentTypes(typesData || []);
       setPatients(patsData || []);
       setStats(statsData || null);
+      setScheduleAlerts(alertsData || []);
     } catch (err) {
       console.error('Failed to load initial metadata:', err);
       addToast('Could not load metadata from API server', 'error');
@@ -96,7 +108,6 @@ export default function App() {
         total_pages: res.total_pages,
       });
 
-      // Also refresh stats
       api.getStats().then((s) => setStats(s)).catch(() => {});
     } catch (err) {
       addToast(err.message || 'Failed to fetch appointments', 'error');
@@ -122,12 +133,12 @@ export default function App() {
     return () => clearTimeout(searchTimeoutRef.current);
   }, [filters, loadAppointments]);
 
-  // Filter Handlers
+  // Handlers
   const handleFilterChange = (key, value) => {
     setFilters((prev) => ({
       ...prev,
       [key]: value,
-      page: 1, // reset to page 1 on filter change
+      page: 1,
     }));
   };
 
@@ -145,23 +156,17 @@ export default function App() {
   };
 
   const handlePageChange = (newPage) => {
-    setFilters((prev) => ({
-      ...prev,
-      page: newPage,
-    }));
+    setFilters((prev) => ({ ...prev, page: newPage }));
   };
 
-  // Create Appointment
   const handleCreateAppointment = async (payload) => {
     const res = await api.createAppointment(payload);
     addToast('Appointment scheduled successfully!', 'success');
-    // Refresh patients list in case inline patient was created
     api.getPatients().then((pats) => setPatients(pats || [])).catch(() => {});
     loadAppointments();
     return res;
   };
 
-  // Edit Appointment
   const handleUpdateAppointment = async (id, payload) => {
     const res = await api.updateAppointment(id, payload);
     addToast('Appointment updated successfully!', 'success');
@@ -169,7 +174,6 @@ export default function App() {
     return res;
   };
 
-  // Quick Status Change from row
   const handleQuickStatusChange = async (id, newStatus) => {
     try {
       await api.updateAppointment(id, { status: newStatus });
@@ -180,7 +184,6 @@ export default function App() {
     }
   };
 
-  // Delete Appointment
   const handleConfirmDelete = async (id) => {
     setDeleteModalState((prev) => ({ ...prev, deleting: true }));
     try {
@@ -194,71 +197,109 @@ export default function App() {
     }
   };
 
+  const handleAcknowledgeAlert = async (alertId) => {
+    try {
+      await api.acknowledgeScheduleChange(alertId);
+      addToast('Schedule alert acknowledged', 'success');
+      api.getScheduleChanges().then((a) => setScheduleAlerts(a || [])).catch(() => {});
+    } catch (err) {
+      addToast('Failed to acknowledge alert', 'error');
+    }
+  };
+
   return (
     <div className="app-container">
       {/* Top Navbar */}
       <Navbar
+        activePortal={portalMode}
+        onSelectPortal={setPortalMode}
         onOpenNewModal={() =>
           setModalState({ isOpen: true, mode: 'create', appointment: null })
         }
+        onOpenLoginModal={() => setIsLoginModalOpen(true)}
       />
 
-      {/* Main Body */}
+      {/* Main Content Area */}
       <main className="main-content">
-        {/* KPI Stats */}
-        <StatsCards
-          stats={stats}
-          activeStatus={filters.status}
-          onSelectStatus={(status) => handleFilterChange('status', status)}
-        />
+        {/* PORTAL 1: SUPER ADMIN */}
+        {portalMode === 'SUPER_ADMIN' && (
+          <SuperAdminPortal
+            doctors={doctors}
+            onRefreshDoctors={fetchMetadata}
+            onAddToast={addToast}
+          />
+        )}
 
-        {/* Section Header */}
-        <div className="section-header">
-          <div className="section-title">
-            <h2>Appointments Directory</h2>
-            <p>Monitor, schedule, and coordinate clinical appointments.</p>
+        {/* PORTAL 2: DOCTOR WORKSPACE */}
+        {portalMode === 'DOCTOR' && (
+          <DoctorPortal onAddToast={addToast} />
+        )}
+
+        {/* PORTAL 3: GENERAL ADMINISTRATION */}
+        {portalMode === 'ADMIN' && (
+          <div>
+            {/* Sudden Doctor Schedule Changes Alert Banner */}
+            <AdminScheduleAlertsBanner
+              alerts={scheduleAlerts}
+              onAcknowledge={handleAcknowledgeAlert}
+            />
+
+            {/* KPI Stats */}
+            <StatsCards
+              stats={stats}
+              activeStatus={filters.status}
+              onSelectStatus={(status) => handleFilterChange('status', status)}
+            />
+
+            {/* Section Header */}
+            <div className="section-header">
+              <div className="section-title">
+                <h2>General Administration & Appointments Directory</h2>
+                <p>Monitor, book, and coordinate hospital appointments across all clinicians.</p>
+              </div>
+              <button
+                id="btn-schedule-main"
+                className="btn btn-primary"
+                onClick={() =>
+                  setModalState({ isOpen: true, mode: 'create', appointment: null })
+                }
+              >
+                + Schedule Appointment
+              </button>
+            </div>
+
+            {/* Search & Filters */}
+            <FiltersBar
+              filters={filters}
+              onFilterChange={handleFilterChange}
+              onResetFilters={handleResetFilters}
+              doctors={doctors}
+              appointmentTypes={appointmentTypes}
+              stats={stats}
+            />
+
+            {/* Appointments Table */}
+            <AppointmentsTable
+              appointments={appointments}
+              loading={loading}
+              pagination={pagination}
+              onPageChange={handlePageChange}
+              onEdit={(appt) =>
+                setModalState({ isOpen: true, mode: 'edit', appointment: appt })
+              }
+              onDelete={(appt) =>
+                setDeleteModalState({ isOpen: true, appointment: appt, deleting: false })
+              }
+              onOpenNewModal={() =>
+                setModalState({ isOpen: true, mode: 'create', appointment: null })
+              }
+              onStatusChange={handleQuickStatusChange}
+            />
           </div>
-          <button
-            id="btn-schedule-main"
-            className="btn btn-primary"
-            onClick={() =>
-              setModalState({ isOpen: true, mode: 'create', appointment: null })
-            }
-          >
-            + Schedule Appointment
-          </button>
-        </div>
-
-        {/* Search & Filters */}
-        <FiltersBar
-          filters={filters}
-          onFilterChange={handleFilterChange}
-          onResetFilters={handleResetFilters}
-          doctors={doctors}
-          appointmentTypes={appointmentTypes}
-          stats={stats}
-        />
-
-        {/* Appointments Table */}
-        <AppointmentsTable
-          appointments={appointments}
-          loading={loading}
-          pagination={pagination}
-          onPageChange={handlePageChange}
-          onEdit={(appt) =>
-            setModalState({ isOpen: true, mode: 'edit', appointment: appt })
-          }
-          onDelete={(appt) =>
-            setDeleteModalState({ isOpen: true, appointment: appt, deleting: false })
-          }
-          onOpenNewModal={() =>
-            setModalState({ isOpen: true, mode: 'create', appointment: null })
-          }
-          onStatusChange={handleQuickStatusChange}
-        />
+        )}
       </main>
 
-      {/* Create / Edit Modal */}
+      {/* Create / Edit Appointment Modal */}
       <AppointmentModal
         isOpen={modalState.isOpen}
         mode={modalState.mode}
@@ -287,8 +328,29 @@ export default function App() {
         onConfirm={handleConfirmDelete}
       />
 
+      {/* Login & Profile Switcher Modal */}
+      <LoginModal
+        isOpen={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
+      />
+
+      {/* Enforced First-Time Password Change for Doctors */}
+      <ForceChangePasswordModal
+        onPasswordChanged={() =>
+          addToast('Password successfully updated! Welcome to your clinical workspace.', 'success')
+        }
+      />
+
       {/* Toast Notifications */}
       <Toast toasts={toasts} onDismiss={dismissToast} />
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <MainApplication />
+    </AuthProvider>
   );
 }

@@ -4,54 +4,84 @@
 [![React](https://img.shields.io/badge/React-18+-61DAFB?style=flat&logo=react)](https://reactjs.org)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?style=flat&logo=postgresql)](https://postgresql.org)
 [![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?style=flat&logo=docker)](https://docker.com)
+[![RBAC](https://img.shields.io/badge/Security-JWT%20%2B%20RBAC-059669?style=flat)](https://jwt.io)
 
-A modern, high-performance, and resilient full-stack web application developed for the **AI Engineering Intern Practical Assessment**. The system enables clinical staff to schedule, track, filter, and manage medical appointments seamlessly with full relational integrity.
+An enterprise full-stack clinical appointment management system developed for the **AI Engineering Intern Practical Assessment**. 
+
+The system incorporates **Role-Based Access Control (RBAC)**, three specialized workspaces (**General Administration**, **Super Admin Portal**, and **Doctor Portal**), SLMC registration verification, temporary credential dispatch with forced password rotation, and real-time sudden schedule change alert broadcasting.
 
 ---
 
 ## Table of Contents
-1. [Executive Summary & Features](#executive-summary--features)
-2. [Technology Stack & Rationale](#technology-stack--rationale)
-3. [Relational Database Architecture](#relational-database-architecture)
-4. [Backend Architecture (Go)](#backend-architecture-go)
-5. [Frontend Architecture (React + Vite)](#frontend-architecture-react--vite)
-6. [AI Usage & Engineering Review Log](#ai-usage--engineering-review-log)
-7. [Getting Started (Local Execution)](#getting-started-local-execution)
-8. [Automated Testing](#automated-testing)
-9. [Cloud Deployment Strategy](#cloud-deployment-strategy)
-10. [API Documentation](#api-documentation)
+1. [Core Features & Assessment Matrix](#core-features--assessment-matrix)
+2. [Multi-Portal System & RBAC Architecture](#multi-portal-system--rbac-architecture)
+3. [Credentials for Evaluation & Testing](#credentials-for-evaluation--testing)
+4. [Relational Database Architecture](#relational-database-architecture)
+5. [Backend & Security Architecture (Go)](#backend--security-architecture-go)
+6. [Frontend Architecture (React + Vite)](#frontend-architecture-react--vite)
+7. [AI Usage & Engineering Review Log](#ai-usage--engineering-review-log)
+8. [Getting Started (Local Execution)](#getting-started-local-execution)
+9. [Connecting to Neon Serverless Cloud PostgreSQL](#connecting-to-neon-serverless-cloud-postgresql)
+10. [Automated Testing](#automated-testing)
+11. [Cloud Deployment Strategy](#cloud-deployment-strategy)
+12. [API Specification](#api-specification)
 
 ---
 
-## 1. Executive Summary & Features
+## 1. Core Features & Assessment Matrix
 
-### Core Practical Assessment Requirements:
-- **Create an Appointment**: Schedule new appointments with patient, doctor, date/time, appointment type, duration, and clinical notes. Includes inline new-patient registration or selection from existing patients.
-- **View Appointments**: Responsive, high-density data table displaying complete relational details (patient contact, clinician specialty, room number, formatted timestamp, and status badges).
-- **Edit an Appointment**: Modify appointment timing, provider, appointment type, or clinical status (Scheduled $\to$ In-Progress $\to$ Completed $\to$ Cancelled).
-- **Delete an Appointment**: Remove cancelled or invalid appointments with interactive confirmation dialogs.
-- **Search & Filter Appointments**:
-  - Live full-text search across patient name, clinician name, and clinical notes.
-  - Multi-criteria filtering by Clinician, Appointment Type, and Status pill tabs with live counters.
-  - Multi-column sorting (Date Ascending/Descending, Patient Name, Doctor Name).
-  - Conflict detection ensuring doctors cannot be double-booked for overlapping slots.
-
----
-
-## 2. Technology Stack & Rationale
-
-| Layer | Technology | Key Strengths & Justification |
+| Feature | Assessment Requirement | Implementation Details |
 | :--- | :--- | :--- |
-| **Frontend** | **React (Vite)** + **Vanilla CSS** | Ultra-fast HMR, lightweight bundle (<80 KB gzip), maximum design fidelity without bulky CSS framework overhead. |
-| **Backend** | **Go (Golang)** + **Gin Engine** | Idiomatic layered architecture, static typing, low memory footprint, sub-millisecond route latency. |
-| **Database** | **PostgreSQL 16** | Robust ACID transactions, relational integrity with strict Foreign Keys, native index support for timestamp and status queries. |
-| **Containerization**| **Docker Compose** | One-command local reproducibility for reviewer evaluation. |
+| **Create Appointment** | Create an appointment | Relational form linking patient, provider, visit type, duration, and clinical notes. Includes **doctor double-booking prevention** and inline new-patient registration. |
+| **View Appointments** | View appointments | High-density data table with patient avatars, clinician specialties, clinic room numbers, formatted timestamps, visit categories, and status badges. |
+| **Edit Appointment** | Edit an appointment | Full appointment editor dialog and instant inline status changer directly from each table row. |
+| **Delete Appointment** | Delete an appointment | Safe deletion workflow with interactive confirmation modal and immediate table & KPI update. |
+| **Search & Filter** | Search or filter appointments | Real-time debounced full-text search across patients, doctors, and notes; status pill tabs with live counters; provider & type dropdowns; multi-column sorting. |
+| **Super Admin Portal** | Enhanced requirement | Onboards medical practitioners with **SLMC Registration Numbers**, issues auto-generated temporary passwords, sets recurring weekly working hours, and audits welcome emails. |
+| **Doctor Portal** | Enhanced requirement | Dedicated workspace for clinicians to review their consultations, advance visit states (Start $\to$ Completed), manage duty hours, and broadcast sudden emergency leaves. |
+| **Sudden Change Alerts** | Enhanced requirement | When a doctor submits emergency leave or adjusted clinic hours, a prominent alert banner broadcasts immediately to the General Administration. |
+| **Auth & Temp Passwords**| Enhanced requirement | JWT authentication, bcrypt password hashing, and enforced first-time password rotation (`must_change_password`). |
 
 ---
 
-## 3. Relational Database Architecture
+## 2. Multi-Portal System & RBAC Architecture
 
-The data model goes beyond flat records to establish a normalized relational schema with 4 primary tables:
+The application provides three specialized role-based workspaces accessible via the top navigation bar or the **"Switch Profile"** dialog:
+
+### 1. 🏥 General Administration Portal (Hospital Staff / Front Desk)
+- Centralized appointment scheduling and management.
+- Real-time search, multi-criteria filtering, and live KPI summary metrics.
+- Prominent **Sudden Schedule Change Alerts Banner** notifying front-desk staff whenever a clinician reports emergency leave or modified hours, with an "Acknowledge" button.
+
+### 2. 👑 Super Admin Portal
+- **Doctor Registry & Onboarding**: Register new physicians with Name, Specialty, SLMC Registration No, Email, Phone, Room Number, and Bio. Automatically generates a secure temporary password and dispatches an activation notification.
+- **Available Days & Time Slots Manager**: Configure each doctor's active days of the week (Monday through Sunday), on-duty shift hours (e.g., `09:00 - 17:00`), and consultation slot duration.
+- **Email Notification Outbox**: Transactional mailer audit trail displaying all sent welcome letters and temporary passwords.
+
+### 3. 🩺 Doctor Portal (Personalized Clinician Workspace)
+- **Consultation Directory**: Shows only the logged-in physician's scheduled patients, formatted timestamps, and clinical notes.
+- **Consultation Progression**: Clinicians can advance appointments directly from `Scheduled` $\to$ `In-Progress` $\to$ `Completed`.
+- **Working Hours Customizer**: Allows doctors to adjust their recurring duty days and working hours.
+- **Report Sudden Leave / Notice**: Modal allowing doctors to broadcast emergency leaves, surgery duties, or delayed clinic starts directly to hospital administration.
+
+---
+
+## 3. Credentials for Evaluation & Testing
+
+The system is pre-seeded with sample fictional accounts for evaluation. You can log in manually or use the **1-Click Demo Profiles** inside the **"Switch Profile"** dialog:
+
+| Role | Name | Email | Password | Features / Flow |
+| :--- | :--- | :--- | :--- | :--- |
+| **Super Admin** | Dr. Arthur Kingsley | `superadmin@medwizard.health` | `SuperAdmin123!` | Doctor onboarding, SLMC verification, Working hours editor, Email outbox. |
+| **General Admin**| Sarah Miller | `admin@medwizard.health` | `Admin123!` | Appointment directory, emergency leave alert banner, patient scheduling. |
+| **Doctor (Active)**| Dr. Eleanor Vance | `eleanor.vance@medwizard.health` | `DoctorPass123!` | Active Consultant Cardiologist workspace, consultation actions. |
+| **Doctor (Temp)** | Dr. Marcus Chen | `marcus.chen@medwizard.health` | `TempDr2026!` | **Demonstrates Enforced Password Change**: Prompts doctor to set a permanent password upon login! |
+
+---
+
+## 4. Relational Database Architecture
+
+The normalized schema enforces **Third Normal Form (3NF)** with foreign keys and cascade/restrict rules across 6 relational tables:
 
 ```
 ┌──────────────────┐               ┌──────────────────────────┐
@@ -63,144 +93,177 @@ The data model goes beyond flat records to establish a normalized relational sch
 │ phone            │       │ │     │ email (UNIQUE)           │
 │ date_of_birth    │       │ │     │ phone                    │
 │ gender           │       │ │     │ room_number              │
-└──────────────────┘       │ │     └──────────────────────────┘
-                           │ │
-                     ┌─────┴─┴────────────────┐
-                     │      APPOINTMENTS      │
-                     ├────────────────────────┤
-                     │ id (PK)                │
-                     │ patient_id (FK)        │
-                     │ doctor_id (FK)         │
-                     │ appointment_type_id(FK)│
-                     │ appointment_date_time  │
-                     │ duration_minutes       │
-                     │ status                 │
-                     │ notes                  │
-                     └─────────┬──────────────┘
-                               │
-                     ┌─────────┴──────────────┐
-                     │   APPOINTMENT_TYPES    │
-                     ├────────────────────────┤
-                     │ id (PK)                │
-                     │ name (UNIQUE)          │
-                     │ description            │
-                     │ default_duration_min   │
-                     └────────────────────────┘
-```
-
-### Table Specifications:
-1. `patients`: Stores patient biographical and demographic info. `ON DELETE CASCADE` ensures clean removal if a patient record is purged.
-2. `doctors`: Maintains healthcare provider details, specialty, and clinical room allocation. `ON DELETE RESTRICT` protects against accidental deletion of physicians with scheduled patients.
-3. `appointment_types`: Categorizes visits (e.g., General Consultation, Follow-up Review, Routine Checkup, Urgent Care) and prescribes default visit durations.
-4. `appointments`: The central transactional table joining patients, physicians, and visit categories with timestamps and status enumerations.
-
-### Indexing Strategy:
-- `idx_appointments_patient_id` & `idx_appointments_doctor_id` for join performance.
-- `idx_appointments_date_time` for fast range filters and calendar sorting.
-- `idx_appointments_status` for quick state-based tab counts.
-
----
-
-## 4. Backend Architecture (Go)
-
-The backend follows an idiomatic **layered clean architecture**:
-
-```
-backend/
-├── cmd/
-│   └── server/
-│       └── main.go               # Server initialization, CORS, routing
-├── internal/
-│   ├── database/
-│   │   └── db.go                 # PostgreSQL connection pool, auto-migration & seed runner
-│   ├── models/
-│   │   └── models.go             # Data structs, DTOs, and query parameters
-│   ├── repository/
-│   │   ├── appointment_repository.go # SQL queries, multi-criteria filtering, joins
-│   │   ├── patient_repository.go     # Patient persistence
-│   │   └── doctor_repository.go      # Doctor & metadata queries
-│   ├── service/
-│   │   ├── appointment_service.go    # Business rules, date parsing, conflict checking
-│   │   └── appointment_service_test.go # Unit tests
-│   └── handler/
-│       ├── appointment_handler.go    # HTTP handlers for appointments CRUD
-│       └── meta_handler.go           # Metadata & patient HTTP handlers
-├── migrations/
-│   └── init.sql                  # Initial DDL script
-└── go.mod / go.sum
+└──────────────────┘       │ │     │ slmc_reg_no              │
+                           │ │     │ status ('Active', etc)   │
+                           │ │     │ bio                      │
+                           │ │     └────────────┬─────────────┘
+                     ┌─────┴─┴────────────────┐ │
+                     │      APPOINTMENTS      │ │1
+                     ├────────────────────────┤ │
+                     │ id (PK)                │ │
+                     │ patient_id (FK)        │ │
+                     │ doctor_id (FK)         │ │
+                     │ appointment_type_id(FK)│ │
+                     │ appointment_date_time  │ │
+                     │ duration_minutes       │ │
+                     │ status                 │ │
+                     │ notes                  │ │
+                     └─────────┬──────────────┘ │
+                               │                │
+                     ┌─────────┴──────────────┐ │
+                     │   APPOINTMENT_TYPES    │ │
+                     ├────────────────────────┤ │
+                     │ id (PK)                │ │
+                     │ name (UNIQUE)          │ │
+                     │ default_duration_min   │ │
+                     └────────────────────────┘ │
+                                                │
+       ┌────────────────────────────────────────┼──────────────────────────────┐
+       │                                        │                              │
+       ▼ *                                      ▼ *                            ▼ *
+┌──────────────────────────┐      ┌───────────────────────────┐  ┌──────────────────────────┐
+│          USERS           │      │     DOCTOR_SCHEDULES      │  │ DOCTOR_SCHEDULE_CHANGES  │
+├──────────────────────────┤      ├───────────────────────────┤  ├──────────────────────────┤
+│ id (PK)                  │      │ id (PK)                   │  │ id (PK)                  │
+│ name                     │      │ doctor_id (FK)            │  │ doctor_id (FK)           │
+│ email (UNIQUE)           │      │ day_of_week (1-7)         │  │ change_type              │
+│ password_hash (bcrypt)   │      │ start_time ("09:00")      │  │ effective_date           │
+│ role (SUPER_ADMIN, etc)  │      │ end_time ("17:00")        │  │ start_time / end_time    │
+│ doctor_id (FK)           │      │ is_available (boolean)    │  │ reason                   │
+│ must_change_password     │      │ slot_duration_minutes     │  │ status ('ACTIVE', etc)   │
+└──────────────────────────┘      └───────────────────────────┘  └──────────────────────────┘
 ```
 
 ---
 
-## 5. Frontend Architecture (React + Vite)
+## 5. Backend & Security Architecture (Go)
 
-The UI was crafted with a **minimal modern clinical dashboard** aesthetic:
-- **Design System Tokens (`index.css`)**: Tailored HSL colors, medical emerald/teal primary gradient, crisp slate borders, soft shadows, and subtle micro-animations.
-- **Components**:
-  - `Navbar.jsx`: Live PostgreSQL health pulse, brand header, and quick-action button.
-  - `StatsCards.jsx`: Interactive KPI metric counters that filter appointments on click.
-  - `FiltersBar.jsx`: Debounced search box, doctor dropdown, appointment type dropdown, sort selector, and status tab pills.
-  - `AppointmentsTable.jsx`: Relational data table with patient avatars, doctor specialty tags, formatted timestamps, status badges, inline status updater, and pagination.
-  - `AppointmentModal.jsx`: Unified dialog supporting both new appointment creation (with inline patient registration toggle) and appointment editing.
-  - `DeleteConfirmModal.jsx`: Safe deletion prompt.
-  - `Toast.jsx`: Non-intrusive floating feedback notifications.
+- **Authentication**: Stateless JSON Web Tokens (JWT) signed with HMAC-SHA256 containing user ID, role, and doctor association.
+- **Password Security**: Bcrypt adaptive hashing (cost factor 10).
+- **RBAC Middleware**:
+  - `auth.AuthMiddleware()`: Validates incoming Bearer token and injects claims into the Gin context.
+  - `auth.RequireRole(...)`: Enforces access privileges (`SUPER_ADMIN`, `ADMIN`, `DOCTOR`).
+- **Conflict Prevention**: SQL interval arithmetic prevents overlapping bookings for the same doctor.
+- **Auto-Migration & Seeding**: The backend applies all DDL tables, indexes, and test credentials automatically on startup.
 
 ---
 
-## 6. AI Usage & Engineering Review Log
+## 6. Frontend Architecture (React + Vite)
 
-In accordance with the assessment instructions (*"How you reviewed and corrected AI-generated work"*), below is a record of key technical challenges encountered during AI-assisted development and how they were evaluated and resolved:
+- **State & Auth Context (`AuthContext.jsx`)**: Manages session state, active portal mode, and demo credentials.
+- **Portals**:
+  - `SuperAdminPortal.jsx`: Doctor registry with SLMC numbers, modal onboarding with credential generation, working hours manager, and email outbox audit.
+  - `DoctorPortal.jsx`: Consultation directory, appointment state advancement, working hours adjustment, and emergency leave reporting.
+  - `AppointmentsTable.jsx` & `FiltersBar.jsx`: General administration appointment grid, search, and status tabs.
+  - `AdminScheduleAlertsBanner.jsx`: Emergency schedule change banner.
+  - `ForceChangePasswordModal.jsx`: Mandatory temporary password rotation dialog.
 
-| Scenario / Issue | Initial AI Proposal | Engineering Review & Root Cause | Corrective Action Implemented |
+---
+
+## 7. AI Usage & Engineering Review Log
+
+| Scenario / Challenge | Initial AI Output | Review & Root Cause Analysis | Corrective Action Applied |
 | :--- | :--- | :--- | :--- |
-| **Port Conflict on PostgreSQL** | Connect to `localhost:5432`. | Host machine already had an unrelated PostgreSQL service on port `5432`, resulting in `failed SASL auth for meduser`. | Re-mapped Docker port to `5433:5432`, decoupled environment configuration with `.env`, and updated connection string fallback logic. |
-| **Date Time Normalization** | Simple RFC3339 string parsing. | Browsers HTML5 `<input type="datetime-local">` emits `YYYY-MM-DDTHH:MM`, causing standard Go RFC3339 parser to fail. | Built a multi-format resilient parser (`parseDateTime`) supporting RFC3339, ISO 8601, and HTML5 datetime inputs. Added unit tests for edge cases. |
-| **Doctor Double-Booking Conflict** | AI suggested allowing any appointment time without check. | Real-world clinics cannot double-book a physician for the same time window. | Implemented `CheckDoctorConflict` repository query using SQL interval overlapping arithmetic `[start, start + duration)` excluding the current appointment on updates. |
-| **Flat vs. Relational Schema** | Storing `patient_name` and `doctor_name` as plain strings in `appointments`. | Violates 3NF, duplicates data, and prevents provider roster management. | Normalized into `patients`, `doctors`, `appointment_types`, and `appointments` with foreign keys and automatic DB seeding. |
+| **Database Port Collision** | Bound PostgreSQL to port `5432`. | Host machine already had an unrelated PostgreSQL service on `5432`, resulting in `failed SASL auth for user meduser`. | Re-mapped Docker container port to `5433:5432`, isolated configuration in `.env`, and updated fallback logic in `db.go`. |
+| **HTML5 Datetime Format Mismatch** | Assumed standard RFC3339 timestamps. | Browser `<input type="datetime-local">` emits `YYYY-MM-DDTHH:MM`, causing standard Go RFC3339 parser to fail. | Built a resilient multi-format parser (`parseDateTime`) with fallback formats and wrote automated unit tests. |
+| **Doctor Double-Booking Conflict** | Allowed any appointment time without check. | Clinicians cannot be scheduled for overlapping slots at the same time. | Implemented `CheckDoctorConflict` utilizing SQL interval overlap math `[start, start + duration)` excluding the current appointment on updates. |
+| **Doctor Temporary Credential Workflow** | Plain text password in API response without rotation constraint. | Security violation; temporary passwords must require mandatory rotation upon first login. | Implemented `must_change_password` flag, bcrypt hashing, and frontend `ForceChangePasswordModal` blocking portal access until rotated. |
 
 ---
 
-## 7. Getting Started (Local Execution)
+## 8. Getting Started (Local Execution)
 
-### Prerequisites:
-- **Docker & Docker Compose** (for PostgreSQL)
-- **Go 1.20+**
-- **Node.js 18+ & npm**
-
-### Step 1: Start PostgreSQL via Docker Compose
-From the project root:
-```bash
+### 1. Start PostgreSQL Container
+```powershell
 docker compose up -d
 ```
-*This starts the PostgreSQL 16 container on port `5433`.*
+*Runs PostgreSQL 16 on port `5433`.*
 
-### Step 2: Start the Go Backend Server
-```bash
+### 2. Start Go Backend Server
+```powershell
 cd backend
 go run cmd/server/main.go
 ```
-*The backend connects to PostgreSQL, automatically applies migrations, seeds sample fictional data, and begins listening at `http://localhost:8080`.*
+*Listens on port `8080`, automatically executes schema migrations, and seeds test accounts.*
 
-### Step 3: Start the React Frontend Application
-In a separate terminal:
-```bash
+### 3. Start React Frontend
+```powershell
 cd frontend
 npm install
 npm run dev
 ```
-*Open `http://localhost:5173` in your web browser to access the Medical Wizard dashboard.*
+*Access the system at `http://localhost:5173`.*
 
 ---
 
-## 8. Automated Testing
+---
 
-To run the backend unit tests and verification suite:
-```bash
+## 9. Connecting to Neon Serverless Cloud PostgreSQL
+
+The backend has built-in support for **Neon** (Serverless PostgreSQL). Whenever `DATABASE_URL` is provided, the backend connects securely over TLS, auto-creates all relational tables, and provisions the initial seed data.
+
+### Step-by-Step Neon Cloud Setup:
+
+#### Step 1: Create a Free Neon Account & Project
+1. Go to [https://neon.tech](https://neon.tech) and sign up (or log in with GitHub/Google).
+2. Click **"Create Project"**.
+3. Name your project (e.g., `medwizard-db`) and select a region closest to you.
+4. Click **"Create Project"**.
+
+#### Step 2: Retrieve the Connection String
+1. On your Neon Dashboard, look at the **Connection Details** widget.
+2. Select **"Postgres"** / **"Go"** or standard **Connection string**.
+3. It will look like this:
+   ```
+   postgresql://alex:AbC123XyZ@ep-cool-fog-123456.us-east-2.aws.neon.tech/neondb?sslmode=require
+   ```
+4. Click the **Copy** button.
+
+#### Step 3: Configure `backend/.env`
+Open `backend/.env` (or copy from `backend/.env.example`) and add your Neon connection string:
+```env
+PORT=8080
+
+# Neon Serverless PostgreSQL Connection String
+DATABASE_URL=postgresql://<user>:<password>@<ep-your-endpoint>.us-east-2.aws.neon.tech/neondb?sslmode=require
+
+# JWT Secret
+JWT_SECRET=medwizard-secret-jwt-signing-key-2026
+```
+
+#### Step 4: Run the Go Backend
+Start the server:
+```powershell
+cd backend
+go run cmd/server/main.go
+```
+The server will output:
+```
+2026/10/12 Starting Medical Wizard Clinical Operations & RBAC API...
+Successfully connected to Cloud PostgreSQL database (Neon)
+Seeding fictional doctors with SLMC registration numbers...
+Seeding appointment types...
+Seeding fictional patients...
+Seeding RBAC users (Super Admin, General Admin, Doctors)...
+Seeding default weekly doctor schedules...
+Database migration, seeding, and RBAC provisioning completed successfully.
+Server listening on port :8080
+```
+
+#### Step 5: Verify in Neon Console & Frontend
+- In the [Neon Console](https://console.neon.tech), open the **SQL Editor** or **Tables** view: you will see `patients`, `doctors`, `appointments`, `appointment_types`, `users`, `doctor_schedules`, and `doctor_schedule_changes` fully populated!
+- Run the frontend (`npm run dev` in `frontend/`) and test your live cloud-backed appointment management system!
+
+---
+
+## 10. Automated Testing
+
+Run the Go backend test suite:
+```powershell
 cd backend
 go test -v ./...
 ```
-
-Expected output:
+Output:
 ```
 === RUN   TestParseDateTime
 --- PASS: TestParseDateTime (0.00s)
@@ -209,52 +272,41 @@ Expected output:
 === RUN   TestConflictIntervalLogic
 --- PASS: TestConflictIntervalLogic (0.00s)
 PASS
-ok  	medwizard-backend/internal/service	0.459s
+ok  	medwizard-backend/internal/service	(cached)
 ```
 
 ---
 
-## 9. Cloud Deployment Strategy
+## 11. Cloud Deployment Strategy
 
-The application is structured for instant containerized deployment to major cloud platforms:
-
-### Option A: Fly.io / Render / Railway (Recommended for rapid production)
-1. **Database**: Provision a managed PostgreSQL instance (e.g., Supabase or Neon).
-2. **Backend**: Deploy `backend/Dockerfile` with environment variables:
-   ```env
-   PORT=8080
-   DB_HOST=<cloud-postgres-host>
-   DB_PORT=5432
-   DB_USER=<cloud-user>
-   DB_PASSWORD=<cloud-password>
-   DB_NAME=<cloud-db>
-   DB_SSLMODE=require
-   ```
-3. **Frontend**: Deploy `frontend` to Vercel, Netlify, or Cloudflare Pages with `VITE_API_URL=https://<your-backend-domain>/api/v1`.
-
-### Option B: AWS (ECS Fargate + RDS Aurora PostgreSQL)
-- Build backend Docker image $\to$ Push to Amazon ECR.
-- Deploy task definition on Amazon ECS (Fargate).
-- Provision AWS RDS PostgreSQL inside the VPC.
-- Frontend hosted on AWS S3 + CloudFront CDN.
+Production Dockerfiles and configurations are ready:
+- **Backend Dockerfile**: Multi-stage Alpine container ([backend/Dockerfile](file:///d:/Education/INternship/SLT/Task%2001/backend/Dockerfile)). Deployable to Fly.io, Render, or AWS ECS Fargate with `DATABASE_URL` pointing to Neon.
+- **Frontend Dockerfile**: Multi-stage Nginx container ([frontend/Dockerfile](file:///d:/Education/INternship/SLT/Task%2001/frontend/Dockerfile)). Deployable to Vercel, Cloudflare Pages, or Render with `VITE_API_URL` pointing to the backend.
+- **Database**: Serverless PostgreSQL managed on [Neon](https://neon.tech).
 
 ---
 
-## 10. API Documentation
+## 12. API Specification
 
-| Method | Endpoint | Description |
-| :--- | :--- | :--- |
-| `GET` | `/api/v1/health` | Healthcheck and service timestamp |
-| `GET` | `/api/v1/appointments` | List appointments with pagination, search, status, and doctor filters |
-| `GET` | `/api/v1/appointments/:id` | Fetch single appointment by ID with full relational joins |
-| `POST` | `/api/v1/appointments` | Create appointment (with conflict check & optional inline patient creation) |
-| `PUT` | `/api/v1/appointments/:id` | Update existing appointment details or status |
-| `DELETE`| `/api/v1/appointments/:id` | Permanently delete an appointment |
-| `GET` | `/api/v1/patients` | Search and list registered patients |
-| `POST` | `/api/v1/patients` | Register new patient |
-| `GET` | `/api/v1/doctors` | List doctors with specialties and room numbers |
-| `GET` | `/api/v1/appointment-types`| List appointment categories and standard durations |
-| `GET` | `/api/v1/analytics/stats` | KPI aggregate statistics for dashboard |
+| Method | Endpoint | Access Level | Description |
+| :--- | :--- | :--- | :--- |
+| `POST` | `/api/v1/auth/login` | Public | Authenticate user and issue JWT |
+| `POST` | `/api/v1/auth/change-password` | Authenticated | Update user password (clears `must_change_password`) |
+| `GET` | `/api/v1/auth/me` | Authenticated | Fetch active user session profile |
+| `GET` | `/api/v1/appointments` | General Access | Search and filter appointments |
+| `POST` | `/api/v1/appointments` | General Access | Book appointment with conflict detection |
+| `PUT` | `/api/v1/appointments/:id` | General Access | Edit appointment or advance status |
+| `DELETE`| `/api/v1/appointments/:id` | General Access | Delete appointment |
+| `POST` | `/api/v1/admin/doctors` | Super Admin | Register doctor with SLMC Reg No & temp password |
+| `GET` | `/api/v1/admin/doctors/:id/schedules`| Super Admin | Fetch doctor recurring weekly availability |
+| `PUT` | `/api/v1/admin/doctors/:id/schedules`| Super Admin | Update doctor working hours and slot lengths |
+| `GET` | `/api/v1/admin/emails` | Super Admin | Audit outbound welcome letters & credentials |
+| `GET` | `/api/v1/admin/schedule-changes` | Admin / Super Admin | Fetch sudden doctor schedule changes |
+| `POST` | `/api/v1/admin/schedule-changes/:id/ack`| Admin / Super Admin | Acknowledge emergency notice |
+| `GET` | `/api/v1/doctor/my-appointments`| Doctor Only | Fetch consultations for logged-in physician |
+| `GET` | `/api/v1/doctor/my-schedule`| Doctor Only | Fetch doctor's own working hours |
+| `PUT` | `/api/v1/doctor/my-schedule`| Doctor Only | Adjust doctor's own working hours |
+| `POST` | `/api/v1/doctor/schedule-changes`| Doctor Only | Broadcast emergency leave or altered clinic hours |
 
 ---
-*Developed with care for the Medical Wizard AI Engineering Assessment.*
+*Developed for the Medical Wizard AI Engineering Practical Assessment.*
