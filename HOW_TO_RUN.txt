@@ -1,0 +1,227 @@
+================================================================================
+MEDICAL WIZARD - SYSTEM EXECUTION & REVIEWER GUIDE
+================================================================================
+
+This document provides clear, step-by-step instructions to run the Medical
+Wizard Clinical Operations Platform locally, along with credentials,
+architecture details, and key features to test.
+
+================================================================================
+1. SYSTEM PREREQUISITES
+================================================================================
+
+Before starting, ensure you have the following installed on your machine:
+  • Go:       Version 1.22 or higher (Check with: go version)
+  • Node.js:  Version 18 or higher (Check with: node -v)
+  • npm:      Version 9 or higher (Check with: npm -v)
+  • (Optional) Docker & Docker Compose (if using a local PostgreSQL container)
+
+================================================================================
+2. STEP-BY-STEP EXECUTION GUIDE
+================================================================================
+
+The backend is pre-configured with a live Neon Serverless Cloud PostgreSQL
+database (`DATABASE_URL` in `backend/.env`). No manual database installation
+or SQL migration is required!
+
+--------------------------------------------------------------------------------
+STEP 1: START THE GO BACKEND SERVER (Port 8080)
+--------------------------------------------------------------------------------
+1. Open a terminal / command prompt.
+2. Navigate to the backend directory:
+     cd backend
+
+3. (First time only) Download Go module dependencies:
+     go mod tidy
+
+4. Start the backend server:
+     go run cmd/server/main.go
+
+   Expected Output:
+     - "Starting Medical Wizard Clinical Operations & RBAC API..."
+     - "Successfully connected to Cloud PostgreSQL database (Neon)"
+     - "Database migration, seeding, and RBAC provisioning completed successfully."
+     - "Server listening on port :8080"
+
+--------------------------------------------------------------------------------
+STEP 2: START THE REACT FRONTEND (Port 5173)
+--------------------------------------------------------------------------------
+1. Open a second terminal / command prompt.
+2. Navigate to the frontend directory:
+     cd frontend
+
+3. (First time only) Install frontend node dependencies:
+     npm install
+
+4. Start the Vite development server:
+     npm run dev
+
+   Expected Output:
+     - "VITE v8.x.x ready in ... ms"
+     - "➜  Local:   http://localhost:5173/"
+
+5. Open your web browser and navigate to:
+     http://localhost:5173
+
+================================================================================
+3. (OPTIONAL) RUNNING WITH LOCAL DOCKER POSTGRESQL
+================================================================================
+
+If you prefer running a local PostgreSQL database instead of the Cloud database:
+
+1. In the project root, start PostgreSQL using Docker Compose:
+     docker compose up -d
+
+2. Update `backend/.env` to point to your local database:
+     DATABASE_URL=postgres://postgres:postgres@localhost:5432/medwizard?sslmode=disable
+
+3. Start the backend as described in Step 1. Tables and seed data will be
+   automatically generated in your local database.
+
+================================================================================
+4. REVIEWER CREDENTIALS & ROLE-BASED ACCESS CONTROL (RBAC)
+================================================================================
+
+All internal workspaces require authenticated access. Reviewers can sign in
+using the accounts below:
+
+--------------------------------------------------------------------------------
+[A] SUPER ADMINISTRATOR (HOSPITAL EXECUTIVE DIRECTOR)
+--------------------------------------------------------------------------------
+Name:         Arthur Kingsley
+Title:        Hospital Executive Director (Non-Doctor Executive Management)
+Email:        superadmin@medwizard.health
+Password:     SuperAdmin123!
+Role:         SUPER_ADMIN
+Authorized:   • Super Admin Portal
+              • General Administration (Appointments & Patient Records)
+Capabilities: • Onboard new doctors with Sri Lanka Medical Council (SLMC) numbers
+              • Auto-generate secure temporary credentials
+              • Inspect simulated email dispatch notifications (Outbox)
+              • Configure weekly duty rosters and consultation slot intervals
+              • View comprehensive Patient Records & Medical Consultation History
+
+--------------------------------------------------------------------------------
+[B] GENERAL HOSPITAL ADMINISTRATOR (FRONT DESK & ADMISSIONS)
+--------------------------------------------------------------------------------
+Name:         Sarah Miller
+Title:        Hospital Front Desk & Admissions Officer (Non-Doctor Staff)
+Email:        admin@medwizard.health
+Password:     Admin123!
+Role:         ADMIN
+Authorized:   • General Administration Portal ONLY
+              (Super Admin and Doctor Portal are locked and hidden)
+Capabilities: • Complete appointment lifecycle (Create, View, Edit, Delete)
+              • Multi-criteria search and filtering (Doctor, Status, Type, Patient)
+              • National Identity Card (NIC) patient verification during booking
+              • Instant retrieval of previous consultation history when entering NIC
+              • Dedicated Patient Registry & Medical History tab
+              • Real-time notification banner for doctor sudden leave / emergencies
+
+--------------------------------------------------------------------------------
+[C] CONSULTANT DOCTOR (ACTIVE PRACTITIONER)
+--------------------------------------------------------------------------------
+Name:         Dr. Eleanor Vance
+Title:        Consultant Cardiologist
+Email:        eleanor.vance@medwizard.health
+Password:     DoctorPass123!
+Role:         DOCTOR
+Authorized:   • Doctor Clinical Workspace ONLY
+              (Administrative portals are locked and hidden)
+Capabilities: • Dedicated practitioner appointment queue and patient history
+              • Consultation workflow progression (Scheduled -> Confirmed -> In Progress -> Completed)
+              • Edit personal weekly availability schedule
+              • Broadcast sudden leave / emergency alerts directly to administration
+
+--------------------------------------------------------------------------------
+[D] CONSULTANT DOCTOR (ENFORCED FIRST-TIME PASSWORD ROTATION WORKFLOW)
+--------------------------------------------------------------------------------
+Name:         Dr. Marcus Chen
+Title:        Orthopedic Surgeon (SLMC #51204)
+Email:        marcus.chen@medwizard.health
+Temp Pass:    TempDr2026!
+Role:         DOCTOR (must_change_password = true)
+Authorized:   • Enforced Password Change Security Gate -> Doctor Clinical Workspace
+Workflow:     Demonstrates secure doctor onboarding. When signed in, the system
+              detects unverified temporary credentials and requires an enforced
+              password update before unlocking the clinical workspace.
+
+--------------------------------------------------------------------------------
+REVIEWER QUICK-FILL HELPER:
+--------------------------------------------------------------------------------
+On the Sign In page (http://localhost:5173), a "Reviewer Quick-Fill" helper
+card is available below the login form. Clicking any role chip will instantly
+populate the email and password fields. Clicking "Sign In to Clinical Workspace"
+submits the form to the backend for real bcrypt validation and JWT token issuance.
+
+================================================================================
+5. KEY SCENARIOS TO TEST
+================================================================================
+
+1. National Identity Card (NIC) Patient Verification & History:
+   - Sign in as General Admin (admin@medwizard.health).
+   - Click "+ Schedule Appointment".
+   - Enter an existing patient NIC (e.g. 198810502341 - James Wilson).
+   - Notice: Patient details auto-fill and their previous consultation history
+     accordion expands showing past visits with Dr. Eleanor Vance.
+   - Enter a new NIC (e.g. 200184501234): A prompt appears to register a new
+     patient record linked permanently to that NIC.
+
+2. Doctor Onboarding with SLMC Registration & Outbox:
+   - Sign in as Super Admin (superadmin@medwizard.health).
+   - Go to "Doctor Registry & SLMC Verification" and click "+ Onboard Medical Practitioner".
+   - Fill in clinician details: Name, SLMC Reg No (e.g. SLMC-MD-77890), Specialty, Email.
+   - Click "Register Practitioner": System auto-generates a secure 10-character
+     temporary password.
+   - Switch to the "Email Outbox & Credential Dispatch" tab: Inspect the simulated
+     invitation email dispatched with login instructions.
+
+3. Doctor Sudden Leave & Emergency Alerts Broadcasting:
+   - Sign in as Doctor Dr. Eleanor Vance (eleanor.vance@medwizard.health).
+   - Click "Report Sudden Leave / Notice".
+   - Enter an emergency leave date and reason (e.g. "Attending emergency cardiology seminar").
+   - Click "Submit Emergency Notice".
+   - Sign out and sign in as General Admin (admin@medwizard.health).
+   - Notice: A prominent amber emergency banner appears at the top of the General
+     Admin portal alerting reception staff to adjust patient bookings!
+   - Click "Acknowledge" to dismiss the alert once noted.
+
+4. Enforced First-Time Password Change Gate:
+   - Sign in as Dr. Marcus Chen (marcus.chen@medwizard.health / TempDr2026!).
+   - Notice: The system immediately locks the workspace behind a mandatory
+     "Update Temporary Password" modal.
+   - Enter the current temp password (`TempDr2026!`) and choose a new permanent password.
+   - Submit: The backend verifies the password, clears `must_change_password`, and
+     unlocks the full clinician dashboard.
+
+================================================================================
+6. PRE-SEEDED TEST PATIENT NICS FOR TESTING
+================================================================================
+
+• James Wilson      — NIC: 198810502341 (2 previous consultations)
+• Sophia Martinez   — NIC: 199578201945
+• Liam Johnson      — NIC: 201231005829
+• Olivia Davis      — NIC: 197451904321
+• Alexander Wright  — NIC: 198221203456
+• Emma Watson       — NIC: 199084601289
+• Nuwan Perera      — NIC: 199214502834
+
+================================================================================
+7. TROUBLESHOOTING & COMMON QUESTIONS
+================================================================================
+
+Q: Port 8080 or Port 5173 is already in use:
+A: • To change backend port, set `PORT=8081` in `backend/.env`.
+   • To change frontend port, run `npm run dev -- --port 5174` in `frontend/`.
+
+Q: Database connection errors:
+A: Ensure your machine has internet access to connect to Neon Cloud PostgreSQL.
+   The connection string is pre-set in `backend/.env`.
+
+Q: How to run backend unit tests?
+A: In `backend/`, run:
+     go test -v ./...
+
+================================================================================
+Medical Wizard Clinical Operations Platform
+================================================================================
