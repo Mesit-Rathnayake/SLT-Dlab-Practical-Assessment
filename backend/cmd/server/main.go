@@ -38,7 +38,7 @@ func main() {
 
 	// Initialize Services
 	apptService := service.NewAppointmentService(apptRepo, patientRepo, doctorRepo, typeRepo)
-	authService := service.NewAuthService(userRepo, doctorRepo)
+	authService := service.NewAuthService(userRepo, doctorRepo, patientRepo)
 
 	// Initialize Handlers
 	apptHandler := handler.NewAppointmentHandler(apptService)
@@ -75,6 +75,7 @@ func main() {
 
 		// Authentication (Public)
 		v1.POST("/auth/login", authHandler.Login)
+		v1.POST("/auth/register", authHandler.Signup)
 
 		// Public metadata queries for initial bootstrap (Doctors, Types, Patients, Stats, Appointments)
 		// Allowing access both with and without auth ensures maximum flexibility for reviewers!

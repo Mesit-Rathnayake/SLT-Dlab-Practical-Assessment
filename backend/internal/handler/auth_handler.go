@@ -44,6 +44,27 @@ func (h *AuthHandler) Login(c *gin.Context) {
 	c.JSON(http.StatusOK, resp)
 }
 
+// Signup handles POST /api/v1/auth/register
+func (h *AuthHandler) Signup(c *gin.Context) {
+	var req models.SignupRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Validation error: " + err.Error()})
+		return
+	}
+
+	resp, err := h.authService.Signup(req)
+	if err != nil {
+		if errors.Is(err, service.ErrEmailExists) || errors.Is(err, service.ErrWeakPassword) {
+			c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusCreated, resp)
+}
+
 // ChangePassword handles POST /api/v1/auth/change-password
 func (h *AuthHandler) ChangePassword(c *gin.Context) {
 	claimsVal, exists := c.Get("claims")

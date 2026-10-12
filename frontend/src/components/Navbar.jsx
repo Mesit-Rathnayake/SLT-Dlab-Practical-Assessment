@@ -18,6 +18,7 @@ export default function Navbar({
   onOpenLoginModal,
   activePortal,
   onSelectPortal,
+  onNavigateHome,
 }) {
   const { user, token, logout } = useAuth();
 
@@ -25,7 +26,7 @@ export default function Navbar({
     <header className="navbar">
       <div className="navbar-inner">
         {/* Brand */}
-        <div className="brand" onClick={() => onSelectPortal('ADMIN')} style={{ cursor: 'pointer' }}>
+        <div className="brand" onClick={onNavigateHome} style={{ cursor: 'pointer' }} title="Medical Wizard Home">
           <div className="brand-icon-wrap">
             <Activity size={22} strokeWidth={2.5} />
           </div>
@@ -37,6 +38,23 @@ export default function Navbar({
 
         {/* Portal Switcher Tabs */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', background: '#f1f5f9', padding: '0.25rem', borderRadius: 'var(--radius-lg)' }}>
+          {onNavigateHome && (
+            <button
+              id="tab-home"
+              className="btn"
+              style={{
+                padding: '0.35rem 0.65rem',
+                fontSize: '0.75rem',
+                background: 'transparent',
+                color: 'var(--text-muted)',
+                borderRadius: 'var(--radius-md)',
+              }}
+              onClick={onNavigateHome}
+              title="Return to Landing Page"
+            >
+              <span>← Home</span>
+            </button>
+          )}
           <button
             id="tab-portal-general"
             className="btn"

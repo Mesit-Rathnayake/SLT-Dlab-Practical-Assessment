@@ -10,12 +10,18 @@ import DoctorPortal from './components/DoctorPortal';
 import AdminScheduleAlertsBanner from './components/AdminScheduleAlertsBanner';
 import LoginModal from './components/LoginModal';
 import ForceChangePasswordModal from './components/ForceChangePasswordModal';
+import LandingPage from './components/LandingPage';
+import AuthView from './components/AuthView';
 import Toast from './components/Toast';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { api } from './services/api';
 
 function MainApplication() {
-  const { user, portalMode, setPortalMode } = useAuth();
+  const { user, portalMode, setPortalMode, quickDemoLogin } = useAuth();
+
+  // Navigation View: 'landing' | 'auth' | 'app'
+  const [currentView, setCurrentView] = useState('landing');
+  const [authMode, setAuthMode] = useState('login'); // 'login' | 'signup'
 
   // Core Data
   const [appointments, setAppointments] = useState([]);
@@ -207,12 +213,56 @@ function MainApplication() {
     }
   };
 
+  // View 1: Landing Page
+  if (currentView === 'landing') {
+    return (
+      <>
+        <LandingPage
+          onEnterApp={() => setCurrentView('app')}
+          onOpenAuth={(mode) => {
+            setAuthMode(mode || 'login');
+            setCurrentView('auth');
+          }}
+          onQuickDemo={async (roleKey) => {
+            try {
+              await quickDemoLogin(roleKey);
+              setCurrentView('app');
+              addToast('Welcome! Logged in successfully.', 'success');
+            } catch (err) {
+              addToast(err.message || 'Demo login failed', 'error');
+            }
+          }}
+          isDbConnected={true}
+        />
+        <Toast toasts={toasts} onDismiss={dismissToast} />
+      </>
+    );
+  }
+
+  // View 2: Dedicated Auth View (Login & Patient Registration)
+  if (currentView === 'auth') {
+    return (
+      <>
+        <AuthView
+          initialMode={authMode}
+          onBackToHome={() => setCurrentView('landing')}
+          onSuccess={() => {
+            setCurrentView('app');
+            addToast('Authenticated successfully!', 'success');
+          }}
+        />
+        <Toast toasts={toasts} onDismiss={dismissToast} />
+      </>
+    );
+  }
+
   return (
     <div className="app-container">
       {/* Top Navbar */}
       <Navbar
         activePortal={portalMode}
         onSelectPortal={setPortalMode}
+        onNavigateHome={() => setCurrentView('landing')}
         onOpenNewModal={() =>
           setModalState({ isOpen: true, mode: 'create', appointment: null })
         }

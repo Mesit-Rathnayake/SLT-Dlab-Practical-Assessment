@@ -55,6 +55,16 @@ export function AuthProvider({ children }) {
     return res;
   };
 
+  const signup = async (payload) => {
+    const res = await api.signup(payload);
+    localStorage.setItem('medwizard_token', res.token);
+    setToken(res.token);
+    setUser(res.user);
+    setMustChangePassword(false);
+    setPortalMode('ADMIN');
+    return res;
+  };
+
   const quickDemoLogin = async (roleKey) => {
     let email = 'admin@medwizard.health';
     let password = 'Admin123!';
@@ -103,6 +113,7 @@ export function AuthProvider({ children }) {
     setMustChangePassword,
     loading,
     login,
+    signup,
     quickDemoLogin,
     logout,
     changePassword,

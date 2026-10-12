@@ -21,15 +21,75 @@ var (
 )
 
 type AuthService struct {
-	userRepo   *repository.UserRepository
-	doctorRepo *repository.DoctorRepository
+	userRepo    *repository.UserRepository
+	doctorRepo  *repository.DoctorRepository
+	patientRepo *repository.PatientRepository
 }
 
-func NewAuthService(userRepo *repository.UserRepository, doctorRepo *repository.DoctorRepository) *AuthService {
+func NewAuthService(userRepo *repository.UserRepository, doctorRepo *repository.DoctorRepository, patientRepo *repository.PatientRepository) *AuthService {
 	return &AuthService{
-		userRepo:   userRepo,
-		doctorRepo: doctorRepo,
+		userRepo:    userRepo,
+		doctorRepo:  doctorRepo,
+		patientRepo: patientRepo,
 	}
+}
+
+func (s *AuthService) Signup(req models.SignupRequest) (*models.LoginResponse, error) {
+	// Check existing email
+	existing, _ := s.userRepo.GetByEmail(strings.TrimSpace(req.Email))
+	if existing != nil {
+		return nil, ErrEmailExists
+	}
+
+	if len(strings.TrimSpace(req.Password)) < 8 {
+		return nil, ErrWeakPassword
+	}
+
+	// 1. Create Patient record in database
+	patient := &models.Patient{
+		Name:        strings.TrimSpace(req.Name),
+		Email:       strings.TrimSpace(req.Email),
+		Phone:       strings.TrimSpace(req.Phone),
+		DateOfBirth: req.DateOfBirth,
+		Gender:      req.Gender,
+	}
+	if patient.Gender == "" {
+		patient.Gender = "Unspecified"
+	}
+	if s.patientRepo != nil {
+		_, _ = s.patientRepo.Create(patient)
+	}
+
+	// 2. Hash Password
+	hash, err := auth.HashPassword(strings.TrimSpace(req.Password))
+	if err != nil {
+		return nil, err
+	}
+
+	// 3. Create User account
+	user := &models.User{
+		Name:               patient.Name,
+		Email:              patient.Email,
+		PasswordHash:       hash,
+		Role:               models.RoleAdmin, // Default to clinical admin/staff access for full appointment management
+		MustChangePassword: false,
+	}
+
+	createdUser, err := s.userRepo.Create(user)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create user: %w", err)
+	}
+
+	token, err := auth.GenerateToken(createdUser)
+	if err != nil {
+		return nil, fmt.Errorf("failed to generate token: %w", err)
+	}
+
+	return &models.LoginResponse{
+		Token:              token,
+		User:               *createdUser,
+		MustChangePassword: false,
+	}, nil
 }
 
 func (s *AuthService) Login(email, password string) (*models.LoginResponse, error) {

@@ -40,6 +40,12 @@ export const api = {
       body: JSON.stringify({ email, password }),
     }),
 
+  signup: (payload) =>
+    request('/auth/register', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
+
   changePassword: (current_password, new_password) =>
     request('/auth/change-password', {
       method: 'POST',

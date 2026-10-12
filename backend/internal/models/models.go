@@ -127,6 +127,16 @@ type LoginRequest struct {
 	Password string `json:"password" binding:"required"`
 }
 
+// SignupRequest for patient / user registration
+type SignupRequest struct {
+	Name        string  `json:"name" binding:"required"`
+	Email       string  `json:"email" binding:"required"`
+	Password    string  `json:"password" binding:"required"`
+	Phone       string  `json:"phone" binding:"required"`
+	DateOfBirth *string `json:"date_of_birth,omitempty"`
+	Gender      string  `json:"gender"`
+}
+
 // LoginResponse
 type LoginResponse struct {
 	Token              string `json:"token"`

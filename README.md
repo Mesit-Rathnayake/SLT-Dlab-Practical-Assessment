@@ -68,14 +68,17 @@ The application provides three specialized role-based workspaces accessible via 
 
 ## 3. Credentials for Evaluation & Testing
 
-The system is pre-seeded with sample fictional accounts for evaluation. You can log in manually or use the **1-Click Demo Profiles** inside the **"Switch Profile"** dialog:
+> 📄 **Evaluation Documents**: Full details are also available in [CREDENTIALS.txt](file:///d:/Education/INternship/SLT/Task%2001/CREDENTIALS.txt) and [CREDENTIALS.md](file:///d:/Education/INternship/SLT/Task%2001/CREDENTIALS.md).
+
+The system features a **Modern Landing Page** and dedicated **Login & Patient Registration** pages. Both the Landing Page and Auth Dialog include **1-Click Reviewer Demo Profile Buttons** for instant evaluation without typing:
 
 | Role | Name | Email | Password | Features / Flow |
 | :--- | :--- | :--- | :--- | :--- |
 | **Super Admin** | Dr. Arthur Kingsley | `superadmin@medwizard.health` | `SuperAdmin123!` | Doctor onboarding, SLMC verification, Working hours editor, Email outbox. |
 | **General Admin**| Sarah Miller | `admin@medwizard.health` | `Admin123!` | Appointment directory, emergency leave alert banner, patient scheduling. |
 | **Doctor (Active)**| Dr. Eleanor Vance | `eleanor.vance@medwizard.health` | `DoctorPass123!` | Active Consultant Cardiologist workspace, consultation actions. |
-| **Doctor (Temp)** | Dr. Marcus Chen | `marcus.chen@medwizard.health` | `TempDr2026!` | **Demonstrates Enforced Password Change**: Prompts doctor to set a permanent password upon login! |
+| **Doctor (Temp)** | Dr. Marcus Chen | `marcus.chen@medwizard.health` | `TempDr2026!` | **Enforced Password Change**: Prompts doctor to set a permanent password upon login! |
+| **Patient** | Nuwan Perera | `nuwan.perera@test.com` | `TestPassword123!` | Patient registration via Landing Page -> "Register as Patient". |
 
 ---
 
