@@ -1,105 +1,81 @@
-# 🏥 Medical Wizard — Enterprise Operations & Access Credentials
+# 🏥 Medical Wizard — Role-Based Access Control & Reviewer Credentials
 
-Comprehensive credentials directory, role permissions, and National Identity Card (NIC) patient tracking documentation.
-
----
-
-## ⚡ 1-Click Instant Workspace Access
-
-Both the **Landing Page** (`http://localhost:5173`) and the **Staff Sign In** dialog feature **1-Click Profile Buttons** that authenticate you into any role immediately:
-
-| Portal | Account / Profile | 1-Click Button | Target Capabilities |
-| :--- | :--- | :---: | :--- |
-| **Super Admin** | `superadmin@medwizard.health` | 👑 **Super Admin** | Doctor onboarding with SLMC Reg No, temp password generation & outbox, weekly duty roster management, full patient medical history access |
-| **General Admin** | `admin@medwizard.health` | 🏢 **General Admin** | Appointments directory, NIC-based booking, emergency leave alert banners, patient registry & previous consultation logs |
-| **Doctor (Active)** | `eleanor.vance@medwizard.health` | 🩺 **Dr. Vance** | Consultation queue, clinical status progression, emergency leave broadcast |
-| **Doctor (Temp Pass)** | `marcus.chen@medwizard.health` | 🛡️ **Dr. Chen** | Enforced first-time password reset security workflow |
+Comprehensive credentials directory, role permissions, navigation guards, and National Identity Card (NIC) patient tracking documentation.
 
 ---
 
-## 🔑 Manual Credentials Directory
+## 🔑 Reviewer Credentials Directory
 
-### 1. Super Admin Account
-- **Email:** `superadmin@medwizard.health`
-- **Password:** `SuperAdmin123!`
-- **Role:** `SUPER_ADMIN`
-- **Permissions:**
-  - Onboard new doctors with **SLMC Registration Numbers** (Sri Lanka Medical Council).
-  - Automatically generate 10-character cryptographically secure temporary passwords.
-  - Review simulated practitioner invitation emails in the **Email Dispatch Outbox**.
-  - Configure doctor weekly duty hours and consultation slot durations.
-  - Access **Patient Records & Medical Consultation History**.
+All portal access requires explicit authentication. Reviewers can sign in using the credentials below:
 
-### 2. General Hospital Administration (Appointments & Patients)
-- **Email:** `admin@medwizard.health`
-- **Password:** `Admin123!`
-- **Role:** `ADMIN`
-- **Permissions:**
-  - Full Appointment CRUD: **Create**, **View**, **Edit**, **Delete**.
-  - Search by patient name, NIC number, phone, or appointment notes.
-  - Multi-criteria filters: Doctor, Appointment Type, Status (`Scheduled`, `In-Progress`, `Completed`, `Cancelled`).
-  - **NIC Patient Verification**: Automatically verifies patient identity and displays previous visits when booking.
-  - Dedicated **Patient Registry & Medical History** tab with full historical consultation logs.
-  - Receive real-time doctor leave broadcast alerts with one-click acknowledgment.
+| Role / Account | Email Address | Password | Authorized Portals | Primary Capabilities |
+| :--- | :--- | :--- | :--- | :--- |
+| **Super Admin** | `superadmin@medwizard.health` | `SuperAdmin123!` | Super Admin, General Admin | Doctor onboarding with SLMC Reg No, temp password generation & outbox, weekly duty roster management, full patient medical history access |
+| **General Admin** | `admin@medwizard.health` | `Admin123!` | General Admin only | Appointments directory, NIC-based booking, emergency leave alert banners, patient registry & previous consultation logs |
+| **Doctor (Active)** | `eleanor.vance@medwizard.health` | `DoctorPass123!` | Doctor Portal only | Consultation queue, clinical status progression, doctor weekly schedule, emergency leave broadcast |
+| **Doctor (Temp Pass)** | `marcus.chen@medwizard.health` | `TempDr2026!` | Doctor Portal (after password change) | Enforced first-time password rotation security workflow |
 
-### 3. Active Doctor Account
-- **Practitioner:** Dr. Eleanor Vance (Consultant Cardiologist)
-- **Email:** `eleanor.vance@medwizard.health`
-- **Password:** `DoctorPass123!`
-- **Role:** `DOCTOR`
-- **Permissions:**
-  - View personalized consultation roster with patient history and clinical notes.
-  - Advance appointment status (`Confirmed` ➔ `In Progress` ➔ `Completed`).
-  - Edit weekly working hours.
-  - Broadcast emergency unavailability alerts to hospital administration.
-
-### 4. New Doctor Account (Enforced Temporary Password Reset)
-- **Practitioner:** Dr. Marcus Chen (Orthopedic Surgeon, SLMC #51204)
-- **Email:** `marcus.chen@medwizard.health`
-- **Temporary Password:** `TempDr2026!`
-- **Role:** `DOCTOR` (`must_change_password = true`)
-- **Workflow:**
-  - Demonstrates secure first-time credential validation.
-  - Upon sign-in, normal access is blocked by an enforced modal requiring the doctor to set a permanent password of 8+ characters before proceeding.
+> **💡 Quick-Fill Helper:**  
+> On both the Sign In page and modal, a "Reviewer Quick-Fill" helper is available to instantly populate the email and password fields. Submitting the form executes real backend authentication via `/api/v1/auth/login` with bcrypt verification and JWT issuance.
 
 ---
 
-## 🪪 National Identity Card (NIC) Patient Architecture
+## 🛡️ Role-Based Access Control (RBAC) & Navigation Guards
 
-Patient records are managed securely within General Administration and Super Admin rather than via public registration:
+The application enforces strict authorization guards across the entire interface:
 
-1. **Unique Primary Key:** National Identity Card (**NIC**) number.
-2. **Booking Workflow:**
-   - When creating an appointment, enter the patient's NIC (e.g. `198810502341`).
-   - The system queries the database:
-     - **Existing Patient:** Auto-populates demographic details and displays an expandable list of their previous consultations.
-     - **New Patient:** Allows staff to enter name and contact details, automatically creating a permanent record under that NIC.
-   - The appointment is attached to the patient's record, permanently available in their medical history.
-3. **Pre-Seeded Patients with NICs:**
+1. **Unauthenticated Visitors:**
+   - Cannot view or access internal hospital portals.
+   - Portal switcher tabs in the navigation bar display `Authorization Required`.
+   - Any attempt to access internal views redirects to the sign-in screen.
 
-| Patient Name | NIC Number | Contact Phone | Records on File |
-| :--- | :--- | :--- | :---: |
-| **James Wilson** | `198810502341` | +1 (555) 890-1234 | 2 Consultations |
-| **Sophia Martinez** | `199578201945` | +1 (555) 901-2345 | 1 Consultation |
-| **Liam Johnson** | `201231005829` | +1 (555) 012-3456 | 1 Consultation |
-| **Olivia Davis** | `197451904321` | +1 (555) 123-4567 | 1 Consultation |
-| **Alexander Wright** | `198221203456` | +1 (555) 234-8765 | 1 Consultation |
-| **Emma Watson** | `199084601289` | +1 (555) 345-9876 | 1 Consultation |
-| **Nuwan Perera** | `199214502834` | +94 77 999 8888 | 1 Consultation |
+2. **Super Administrator (`SUPER_ADMIN`):**
+   - Navigation bar provides tabs for both **Super Admin** and **General Admin**.
+   - Personal doctor clinical queues are hidden to preserve clinical separation of concerns.
+
+3. **General Hospital Administrator (`ADMIN`):**
+   - Navigation bar displays only the **General Admin** portal (Appointments Directory & Patient Records).
+   - Super Admin and Doctor portals are completely restricted and hidden.
+
+4. **Consultant Doctor (`DOCTOR`):**
+   - Navigation bar displays only the **Doctor Portal**.
+   - Administrative tabs are completely restricted and hidden.
+   - Initial sign-in with temporary credentials enforces an immediate password reset dialog before access is granted.
 
 ---
 
-## 🚀 Local Setup Guide
+## 🪪 Patient Records & NIC (National Identity Card) System
+
+Patient registration and verification is managed within the clinical administration:
+- **Primary Identifier:** National Identity Card (NIC) number.
+- **Appointment Booking Workflow:**
+  1. Click **+ Schedule Appointment**.
+  2. Enter Patient NIC (e.g., `198810502341`).
+  3. The system checks whether this NIC exists in the hospital database:
+     - **Existing Patient:** Automatically populates demographics and reveals previous consultation history.
+     - **New Patient:** Registers a permanent patient record attached to that NIC.
+  4. The newly booked consultation is permanently attached to that patient's chronological history.
+
+### Pre-Seeded Test Patients:
+- **James Wilson** — NIC: `198810502341` (2 previous consultations)
+- **Sophia Martinez** — NIC: `199578201945`
+- **Liam Johnson** — NIC: `201231005829`
+- **Olivia Davis** — NIC: `197451904321`
+- **Alexander Wright** — NIC: `198221203456`
+- **Emma Watson** — NIC: `199084601289`
+- **Nuwan Perera** — NIC: `199214502834`
+
+---
+
+## 🚀 Running Locally
 
 ```bash
-# 1. Backend (Go 1.22+)
+# Backend (Port 8080)
 cd backend
 go run cmd/server/main.go
-# Server listens on http://localhost:8080
 
-# 2. Frontend (Node.js 18+)
+# Frontend (Port 5173)
 cd frontend
 npm install
 npm run dev
-# Application runs at http://localhost:5173
 ```

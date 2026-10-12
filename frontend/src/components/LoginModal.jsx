@@ -3,7 +3,7 @@ import { X, Lock, Mail, ShieldAlert, Sparkles, User, Stethoscope, Crown } from '
 import { useAuth } from '../context/AuthContext';
 
 export default function LoginModal({ isOpen, onClose }) {
-  const { login, quickDemoLogin } = useAuth();
+  const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -25,17 +25,10 @@ export default function LoginModal({ isOpen, onClose }) {
     }
   };
 
-  const handleDemo = async (roleKey) => {
+  const handleQuickFill = (fillEmail, fillPass) => {
+    setEmail(fillEmail);
+    setPassword(fillPass);
     setError('');
-    setLoading(true);
-    try {
-      await quickDemoLogin(roleKey);
-      onClose();
-    } catch (err) {
-      setError(err.message || 'Demo login failed');
-    } finally {
-      setLoading(false);
-    }
   };
 
   return (
@@ -43,8 +36,8 @@ export default function LoginModal({ isOpen, onClose }) {
       <div className="modal-card" style={{ maxWidth: '480px' }} onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <div className="modal-title">
-            <h3>Portal Authentication</h3>
-            <p>Access role-based clinical or administration workspace</p>
+            <h3>Staff & Clinician Sign In</h3>
+            <p>Access role-based clinical workspace and administration</p>
           </div>
           <button className="btn-icon" onClick={onClose}>
             <X size={18} />
@@ -52,76 +45,6 @@ export default function LoginModal({ isOpen, onClose }) {
         </div>
 
         <div className="modal-body">
-          {/* Quick 1-Click Demo Logins */}
-          <div style={{ marginBottom: '1rem' }}>
-            <p style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '0.5rem', letterSpacing: '0.04em' }}>
-              ⚡ 1-Click Demo Profiles (For Reviewers)
-            </p>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
-              <button
-                type="button"
-                className="btn btn-secondary"
-                style={{ fontSize: '0.75rem', padding: '0.5rem', justifyContent: 'flex-start', textAlign: 'left', borderColor: '#cbd5e1' }}
-                onClick={() => handleDemo('super_admin')}
-                disabled={loading}
-              >
-                <Crown size={15} color="#d97706" />
-                <div>
-                  <strong>Super Admin</strong>
-                  <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>Doctor & Hours Mgmt</div>
-                </div>
-              </button>
-
-              <button
-                type="button"
-                className="btn btn-secondary"
-                style={{ fontSize: '0.75rem', padding: '0.5rem', justifyContent: 'flex-start', textAlign: 'left', borderColor: '#cbd5e1' }}
-                onClick={() => handleDemo('admin')}
-                disabled={loading}
-              >
-                <User size={15} color="#0284c7" />
-                <div>
-                  <strong>General Admin</strong>
-                  <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>Hospital Appointments</div>
-                </div>
-              </button>
-
-              <button
-                type="button"
-                className="btn btn-secondary"
-                style={{ fontSize: '0.75rem', padding: '0.5rem', justifyContent: 'flex-start', textAlign: 'left', borderColor: '#cbd5e1' }}
-                onClick={() => handleDemo('doctor')}
-                disabled={loading}
-              >
-                <Stethoscope size={15} color="#0d9488" />
-                <div>
-                  <strong>Dr. Vance (Active)</strong>
-                  <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>Cardiologist Portal</div>
-                </div>
-              </button>
-
-              <button
-                type="button"
-                className="btn btn-secondary"
-                style={{ fontSize: '0.75rem', padding: '0.5rem', justifyContent: 'flex-start', textAlign: 'left', borderColor: '#fde68a', background: '#fffbeb' }}
-                onClick={() => handleDemo('doctor_temp')}
-                disabled={loading}
-              >
-                <Lock size={15} color="#b45309" />
-                <div>
-                  <strong>Dr. Chen (Temp)</strong>
-                  <div style={{ fontSize: '0.65rem', color: '#b45309' }}>Test Password Change</div>
-                </div>
-              </button>
-            </div>
-          </div>
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', margin: '0.5rem 0' }}>
-            <div style={{ flex: 1, height: '1px', background: 'var(--border-subtle)' }} />
-            <span style={{ fontSize: '0.75rem', color: 'var(--text-light)', fontWeight: 600 }}>OR ENTER CREDENTIALS</span>
-            <div style={{ flex: 1, height: '1px', background: 'var(--border-subtle)' }} />
-          </div>
-
           {error && (
             <div
               style={{
@@ -134,6 +57,7 @@ export default function LoginModal({ isOpen, onClose }) {
                 display: 'flex',
                 alignItems: 'center',
                 gap: '0.5rem',
+                marginBottom: '1rem',
               }}
             >
               <ShieldAlert size={16} />
@@ -147,7 +71,7 @@ export default function LoginModal({ isOpen, onClose }) {
               <input
                 id="input-login-email"
                 type="email"
-                className="form-input"
+                className="form-control"
                 placeholder="e.g. superadmin@medwizard.health"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -160,7 +84,7 @@ export default function LoginModal({ isOpen, onClose }) {
               <input
                 id="input-login-password"
                 type="password"
-                className="form-input"
+                className="form-control"
                 placeholder="Enter password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -175,9 +99,70 @@ export default function LoginModal({ isOpen, onClose }) {
               style={{ width: '100%', marginTop: '0.5rem' }}
               disabled={loading}
             >
-              {loading ? 'Authenticating...' : 'Sign In'}
+              {loading ? 'Authenticating...' : 'Sign In to Workspace'}
             </button>
           </form>
+
+          {/* Quick-Fill Helper for Reviewers */}
+          <div style={{ marginTop: '1.25rem', borderTop: '1px solid var(--border-subtle)', paddingTop: '1rem' }}>
+            <p style={{ fontSize: '0.725rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '0.5rem', letterSpacing: '0.04em', display: 'flex', justifyContent: 'space-between' }}>
+              <span>Reviewer Quick-Fill</span>
+              <span style={{ textTransform: 'none', color: '#0284c7' }}>Populates email & password</span>
+            </p>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+              <button
+                type="button"
+                className="btn btn-secondary"
+                style={{ fontSize: '0.75rem', padding: '0.45rem 0.6rem', justifyContent: 'flex-start', textAlign: 'left', borderColor: '#cbd5e1' }}
+                onClick={() => handleQuickFill('superadmin@medwizard.health', 'SuperAdmin123!')}
+              >
+                <Crown size={14} color="#d97706" />
+                <div>
+                  <strong>Super Admin</strong>
+                  <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>Full system oversight</div>
+                </div>
+              </button>
+
+              <button
+                type="button"
+                className="btn btn-secondary"
+                style={{ fontSize: '0.75rem', padding: '0.45rem 0.6rem', justifyContent: 'flex-start', textAlign: 'left', borderColor: '#cbd5e1' }}
+                onClick={() => handleQuickFill('admin@medwizard.health', 'Admin123!')}
+              >
+                <User size={14} color="#0284c7" />
+                <div>
+                  <strong>General Admin</strong>
+                  <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>Appointments & Patients</div>
+                </div>
+              </button>
+
+              <button
+                type="button"
+                className="btn btn-secondary"
+                style={{ fontSize: '0.75rem', padding: '0.45rem 0.6rem', justifyContent: 'flex-start', textAlign: 'left', borderColor: '#cbd5e1' }}
+                onClick={() => handleQuickFill('eleanor.vance@medwizard.health', 'DoctorPass123!')}
+              >
+                <Stethoscope size={14} color="#0d9488" />
+                <div>
+                  <strong>Dr. Vance</strong>
+                  <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>Cardiologist Portal</div>
+                </div>
+              </button>
+
+              <button
+                type="button"
+                className="btn btn-secondary"
+                style={{ fontSize: '0.75rem', padding: '0.45rem 0.6rem', justifyContent: 'flex-start', textAlign: 'left', borderColor: '#fde68a', background: '#fffbeb' }}
+                onClick={() => handleQuickFill('marcus.chen@medwizard.health', 'TempDr2026!')}
+              >
+                <Lock size={14} color="#b45309" />
+                <div>
+                  <strong>Dr. Chen (Temp)</strong>
+                  <div style={{ fontSize: '0.65rem', color: '#b45309' }}>Password change test</div>
+                </div>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>

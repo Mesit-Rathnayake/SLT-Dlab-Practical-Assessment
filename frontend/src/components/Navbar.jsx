@@ -10,7 +10,8 @@ import {
   LogIn,
   LogOut,
   User,
-  KeyRound
+  KeyRound,
+  Lock
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
@@ -22,6 +23,11 @@ export default function Navbar({
   onNavigateHome,
 }) {
   const { user, token, logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+    if (onNavigateHome) onNavigateHome();
+  };
 
   return (
     <header className="navbar">
@@ -37,7 +43,7 @@ export default function Navbar({
           </div>
         </div>
 
-        {/* Portal Switcher Tabs */}
+        {/* Role-Based Portal Switcher Tabs */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', background: '#f1f5f9', padding: '0.25rem', borderRadius: 'var(--radius-lg)' }}>
           {onNavigateHome && (
             <button
@@ -56,56 +62,73 @@ export default function Navbar({
               <span>← Home</span>
             </button>
           )}
-          <button
-            id="tab-portal-general"
-            className="btn"
-            style={{
-              padding: '0.35rem 0.75rem',
-              fontSize: '0.75rem',
-              background: activePortal === 'ADMIN' ? '#ffffff' : 'transparent',
-              color: activePortal === 'ADMIN' ? '#0f172a' : 'var(--text-muted)',
-              boxShadow: activePortal === 'ADMIN' ? 'var(--shadow-sm)' : 'none',
-              borderRadius: 'var(--radius-md)',
-            }}
-            onClick={() => onSelectPortal('ADMIN')}
-          >
-            <Building size={14} color="#0284c7" />
-            <span>General Admin</span>
-          </button>
 
-          <button
-            id="tab-portal-super"
-            className="btn"
-            style={{
-              padding: '0.35rem 0.75rem',
-              fontSize: '0.75rem',
-              background: activePortal === 'SUPER_ADMIN' ? '#ffffff' : 'transparent',
-              color: activePortal === 'SUPER_ADMIN' ? '#0f172a' : 'var(--text-muted)',
-              boxShadow: activePortal === 'SUPER_ADMIN' ? 'var(--shadow-sm)' : 'none',
-              borderRadius: 'var(--radius-md)',
-            }}
-            onClick={() => onSelectPortal('SUPER_ADMIN')}
-          >
-            <Crown size={14} color="#d97706" />
-            <span>Super Admin</span>
-          </button>
+          {!user && (
+            <div style={{ padding: '0.35rem 0.65rem', fontSize: '0.75rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+              <Lock size={13} />
+              <span>Authorization Required</span>
+            </div>
+          )}
 
-          <button
-            id="tab-portal-doctor"
-            className="btn"
-            style={{
-              padding: '0.35rem 0.75rem',
-              fontSize: '0.75rem',
-              background: activePortal === 'DOCTOR' ? '#ffffff' : 'transparent',
-              color: activePortal === 'DOCTOR' ? '#0f172a' : 'var(--text-muted)',
-              boxShadow: activePortal === 'DOCTOR' ? 'var(--shadow-sm)' : 'none',
-              borderRadius: 'var(--radius-md)',
-            }}
-            onClick={() => onSelectPortal('DOCTOR')}
-          >
-            <Stethoscope size={14} color="#0d9488" />
-            <span>Doctor Portal</span>
-          </button>
+          {/* General Admin: Visible to SUPER_ADMIN and ADMIN */}
+          {user && (user.role === 'SUPER_ADMIN' || user.role === 'ADMIN') && (
+            <button
+              id="tab-portal-general"
+              className="btn"
+              style={{
+                padding: '0.35rem 0.75rem',
+                fontSize: '0.75rem',
+                background: activePortal === 'ADMIN' ? '#ffffff' : 'transparent',
+                color: activePortal === 'ADMIN' ? '#0f172a' : 'var(--text-muted)',
+                boxShadow: activePortal === 'ADMIN' ? 'var(--shadow-sm)' : 'none',
+                borderRadius: 'var(--radius-md)',
+              }}
+              onClick={() => onSelectPortal('ADMIN')}
+            >
+              <Building size={14} color="#0284c7" />
+              <span>General Admin</span>
+            </button>
+          )}
+
+          {/* Super Admin: Visible ONLY to SUPER_ADMIN */}
+          {user && user.role === 'SUPER_ADMIN' && (
+            <button
+              id="tab-portal-super"
+              className="btn"
+              style={{
+                padding: '0.35rem 0.75rem',
+                fontSize: '0.75rem',
+                background: activePortal === 'SUPER_ADMIN' ? '#ffffff' : 'transparent',
+                color: activePortal === 'SUPER_ADMIN' ? '#0f172a' : 'var(--text-muted)',
+                boxShadow: activePortal === 'SUPER_ADMIN' ? 'var(--shadow-sm)' : 'none',
+                borderRadius: 'var(--radius-md)',
+              }}
+              onClick={() => onSelectPortal('SUPER_ADMIN')}
+            >
+              <Crown size={14} color="#d97706" />
+              <span>Super Admin</span>
+            </button>
+          )}
+
+          {/* Doctor Portal: Visible ONLY to DOCTOR */}
+          {user && user.role === 'DOCTOR' && (
+            <button
+              id="tab-portal-doctor"
+              className="btn"
+              style={{
+                padding: '0.35rem 0.75rem',
+                fontSize: '0.75rem',
+                background: activePortal === 'DOCTOR' ? '#ffffff' : 'transparent',
+                color: activePortal === 'DOCTOR' ? '#0f172a' : 'var(--text-muted)',
+                boxShadow: activePortal === 'DOCTOR' ? 'var(--shadow-sm)' : 'none',
+                borderRadius: 'var(--radius-md)',
+              }}
+              onClick={() => onSelectPortal('DOCTOR')}
+            >
+              <Stethoscope size={14} color="#0d9488" />
+              <span>Doctor Portal</span>
+            </button>
+          )}
         </div>
 
         {/* Actions & Profile */}
@@ -151,9 +174,10 @@ export default function Navbar({
                 <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>{user.role}</div>
               </div>
               <button
+                id="btn-nav-logout"
                 className="btn-icon"
-                title="Switch Profile / Logout"
-                onClick={logout}
+                title="Sign Out"
+                onClick={handleLogout}
                 style={{ color: '#ef4444', width: '26px', height: '26px' }}
               >
                 <LogOut size={14} />
@@ -161,18 +185,18 @@ export default function Navbar({
             </div>
           ) : (
             <button
-              id="btn-nav-login"
+              id="btn-nav-signin"
               className="btn btn-secondary"
               style={{ padding: '0.45rem 0.85rem', fontSize: '0.8125rem' }}
               onClick={onOpenLoginModal}
             >
               <LogIn size={15} />
-              <span>Switch Profile</span>
+              <span>Sign In</span>
             </button>
           )}
 
-          {/* Quick Action Button in General Admin */}
-          {activePortal === 'ADMIN' && (
+          {/* Quick Action Button in General Admin (Only for authorized admin roles) */}
+          {activePortal === 'ADMIN' && user && (user.role === 'ADMIN' || user.role === 'SUPER_ADMIN') && (
             <button
               id="btn-new-appointment-nav"
               className="btn btn-primary"

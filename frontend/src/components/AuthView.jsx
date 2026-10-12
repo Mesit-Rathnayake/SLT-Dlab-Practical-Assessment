@@ -51,19 +51,11 @@ export default function AuthView({ onBackToHome, onSuccess }) {
     }
   };
 
-  // Handle 1-click Demo Profiles
-  const handleDemo = async (roleKey) => {
+  // Handle Quick-Fill of Reviewer Credentials into form inputs
+  const handleQuickFill = (email, password) => {
+    setLoginEmail(email);
+    setLoginPassword(password);
     setError('');
-    setSuccessMsg('');
-    setLoading(true);
-    try {
-      await quickDemoLogin(roleKey);
-      if (onSuccess) onSuccess();
-    } catch (err) {
-      setError(err.message || 'Demo login failed');
-    } finally {
-      setLoading(false);
-    }
   };
 
   return (
@@ -135,10 +127,10 @@ export default function AuthView({ onBackToHome, onSuccess }) {
           {/* Card Title */}
           <div style={{ marginBottom: '1.5rem', textAlign: 'center' }}>
             <h2 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#0f172a', margin: '0 0 0.35rem' }}>
-              Staff & Clinician Authentication
+              Staff & Clinician Sign In
             </h2>
             <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', margin: 0 }}>
-              Access role-based clinical workspace, patient records, and scheduling
+              Authorized access to hospital clinical operations & patient records
             </p>
           </div>
 
@@ -183,102 +175,6 @@ export default function AuthView({ onBackToHome, onSuccess }) {
             </div>
           )}
 
-          {/* 1-Click Access Box */}
-          <div
-            style={{
-              background: '#f8fafc',
-              border: '1px solid var(--border-subtle)',
-              borderRadius: '12px',
-              padding: '1rem',
-              marginBottom: '1.5rem',
-            }}
-          >
-            <div
-              style={{
-                fontSize: '0.7rem',
-                fontWeight: 800,
-                textTransform: 'uppercase',
-                color: 'var(--text-muted)',
-                marginBottom: '0.65rem',
-                letterSpacing: '0.05em',
-              }}
-            >
-              Institutional Portals & Role Access
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
-              <button
-                type="button"
-                className="btn btn-secondary"
-                style={{ fontSize: '0.75rem', padding: '0.55rem', justifyContent: 'flex-start' }}
-                onClick={() => handleDemo('super_admin')}
-                disabled={loading}
-              >
-                <Crown size={15} color="#d97706" />
-                <div>
-                  <strong>Executive Admin</strong>
-                  <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>Practitioners & Facilities</div>
-                </div>
-              </button>
-
-              <button
-                type="button"
-                className="btn btn-secondary"
-                style={{ fontSize: '0.75rem', padding: '0.55rem', justifyContent: 'flex-start' }}
-                onClick={() => handleDemo('admin')}
-                disabled={loading}
-              >
-                <Building size={15} color="#0284c7" />
-                <div>
-                  <strong>Clinical Front Desk</strong>
-                  <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>Appointments & Admissions</div>
-                </div>
-              </button>
-
-              <button
-                type="button"
-                className="btn btn-secondary"
-                style={{ fontSize: '0.75rem', padding: '0.55rem', justifyContent: 'flex-start' }}
-                onClick={() => handleDemo('doctor')}
-                disabled={loading}
-              >
-                <Stethoscope size={15} color="#0d9488" />
-                <div>
-                  <strong>Cardiology Clinic</strong>
-                  <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>Dr. Eleanor Vance, MD</div>
-                </div>
-              </button>
-
-              <button
-                type="button"
-                className="btn btn-secondary"
-                style={{ fontSize: '0.75rem', padding: '0.55rem', justifyContent: 'flex-start' }}
-                onClick={() => handleDemo('doctor_temp')}
-                disabled={loading}
-              >
-                <User size={15} color="#475569" />
-                <div>
-                  <strong>Orthopedic Surgery</strong>
-                  <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>Dr. Marcus Chen, MD</div>
-                </div>
-              </button>
-            </div>
-          </div>
-
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.75rem',
-              margin: '1.25rem 0',
-            }}
-          >
-            <div style={{ flex: 1, height: '1px', background: 'var(--border-subtle)' }} />
-            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600 }}>
-              OR SIGN IN WITH CREDENTIALS
-            </span>
-            <div style={{ flex: 1, height: '1px', background: 'var(--border-subtle)' }} />
-          </div>
-
           {/* Login Form */}
           <form onSubmit={handleLoginSubmit}>
             <div className="form-group" style={{ marginBottom: '1rem' }}>
@@ -286,8 +182,9 @@ export default function AuthView({ onBackToHome, onSuccess }) {
               <div style={{ position: 'relative' }}>
                 <input
                   type="email"
+                  id="auth-input-email"
                   className="form-control"
-                  placeholder="admin@medwizard.health"
+                  placeholder="name@medwizard.health"
                   value={loginEmail}
                   onChange={(e) => setLoginEmail(e.target.value)}
                   style={{ paddingLeft: '2.5rem' }}
@@ -313,6 +210,7 @@ export default function AuthView({ onBackToHome, onSuccess }) {
               <div style={{ position: 'relative' }}>
                 <input
                   type={showLoginPassword ? 'text' : 'password'}
+                  id="auth-input-password"
                   className="form-control"
                   placeholder="••••••••"
                   value={loginPassword}
@@ -351,6 +249,7 @@ export default function AuthView({ onBackToHome, onSuccess }) {
 
             <button
               type="submit"
+              id="auth-btn-submit"
               className="btn btn-primary"
               style={{ width: '100%', padding: '0.8rem', fontSize: '0.925rem', borderRadius: '10px' }}
               disabled={loading}
@@ -358,6 +257,87 @@ export default function AuthView({ onBackToHome, onSuccess }) {
               {loading ? 'Authenticating...' : 'Sign In to Clinical Workspace'}
             </button>
           </form>
+
+          {/* Quick-Fill Reviewer Reference Box */}
+          <div
+            style={{
+              marginTop: '1.75rem',
+              background: '#f8fafc',
+              border: '1px solid var(--border-subtle)',
+              borderRadius: '12px',
+              padding: '1rem',
+            }}
+          >
+            <div
+              style={{
+                fontSize: '0.7rem',
+                fontWeight: 800,
+                textTransform: 'uppercase',
+                color: 'var(--text-muted)',
+                marginBottom: '0.65rem',
+                letterSpacing: '0.05em',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between'
+              }}
+            >
+              <span>Reviewer Quick-Fill Credentials</span>
+              <span style={{ fontSize: '0.65rem', color: '#0284c7', textTransform: 'none' }}>Click to populate form</span>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+              <button
+                type="button"
+                className="btn btn-secondary"
+                style={{ fontSize: '0.75rem', padding: '0.55rem', justifyContent: 'flex-start', textAlign: 'left' }}
+                onClick={() => handleQuickFill('superadmin@medwizard.health', 'SuperAdmin123!')}
+              >
+                <Crown size={15} color="#d97706" />
+                <div>
+                  <strong>Super Admin</strong>
+                  <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>superadmin@...</div>
+                </div>
+              </button>
+
+              <button
+                type="button"
+                className="btn btn-secondary"
+                style={{ fontSize: '0.75rem', padding: '0.55rem', justifyContent: 'flex-start', textAlign: 'left' }}
+                onClick={() => handleQuickFill('admin@medwizard.health', 'Admin123!')}
+              >
+                <Building size={15} color="#0284c7" />
+                <div>
+                  <strong>General Admin</strong>
+                  <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>admin@...</div>
+                </div>
+              </button>
+
+              <button
+                type="button"
+                className="btn btn-secondary"
+                style={{ fontSize: '0.75rem', padding: '0.55rem', justifyContent: 'flex-start', textAlign: 'left' }}
+                onClick={() => handleQuickFill('eleanor.vance@medwizard.health', 'DoctorPass123!')}
+              >
+                <Stethoscope size={15} color="#0d9488" />
+                <div>
+                  <strong>Dr. Vance</strong>
+                  <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>eleanor.vance@...</div>
+                </div>
+              </button>
+
+              <button
+                type="button"
+                className="btn btn-secondary"
+                style={{ fontSize: '0.75rem', padding: '0.55rem', justifyContent: 'flex-start', textAlign: 'left' }}
+                onClick={() => handleQuickFill('marcus.chen@medwizard.health', 'TempDr2026!')}
+              >
+                <User size={15} color="#475569" />
+                <div>
+                  <strong>Dr. Chen (Temp)</strong>
+                  <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>marcus.chen@...</div>
+                </div>
+              </button>
+            </div>
+          </div>
 
           <div style={{ marginTop: '1.5rem', textAlign: 'center', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
             Patient registrations are handled directly within the General Administration portal using NIC verification.

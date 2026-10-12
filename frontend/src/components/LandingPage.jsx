@@ -18,7 +18,8 @@ import {
 export default function LandingPage({
   onEnterApp,
   onOpenAuth,
-  onQuickDemo,
+  user,
+  onLogout,
 }) {
   return (
     <div style={{ minHeight: '100vh', background: '#f8fafc', color: '#0f172a' }}>
@@ -76,24 +77,40 @@ export default function LandingPage({
               <span>Network Operational</span>
             </div>
 
-            <button
-              id="landing-btn-signin"
-              className="btn btn-secondary"
-              style={{ fontSize: '0.8125rem', padding: '0.5rem 1rem' }}
-              onClick={() => onOpenAuth('login')}
-            >
-              Staff Sign In
-            </button>
-
-            <button
-              id="landing-btn-portal"
-              className="btn btn-primary"
-              style={{ fontSize: '0.8125rem', padding: '0.5rem 1.15rem' }}
-              onClick={onEnterApp}
-            >
-              <span>Enter Clinical Portal</span>
-              <ArrowRight size={15} />
-            </button>
+            {user ? (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                <span style={{ fontSize: '0.8125rem', color: '#0f172a', fontWeight: 600 }}>
+                  {user.name} ({user.role})
+                </span>
+                <button
+                  id="landing-btn-portal"
+                  className="btn btn-primary"
+                  style={{ fontSize: '0.8125rem', padding: '0.5rem 1rem' }}
+                  onClick={onEnterApp}
+                >
+                  <span>Go to Workspace</span>
+                  <ArrowRight size={15} />
+                </button>
+                <button
+                  id="landing-btn-logout"
+                  className="btn btn-secondary"
+                  style={{ fontSize: '0.8125rem', padding: '0.5rem 0.85rem' }}
+                  onClick={onLogout}
+                >
+                  Sign Out
+                </button>
+              </div>
+            ) : (
+              <button
+                id="landing-btn-signin"
+                className="btn btn-primary"
+                style={{ fontSize: '0.8125rem', padding: '0.5rem 1.15rem' }}
+                onClick={() => onOpenAuth('login')}
+              >
+                <Lock size={14} />
+                <span>Staff Sign In</span>
+              </button>
+            )}
           </div>
         </div>
       </header>
@@ -161,115 +178,61 @@ export default function LandingPage({
             justifyContent: 'center',
             gap: '1rem',
             flexWrap: 'wrap',
-            marginBottom: '3.5rem',
+            marginBottom: '3rem',
           }}
         >
-          <button
-            id="hero-btn-enter-app"
-            className="btn btn-primary"
-            style={{ fontSize: '1rem', padding: '0.85rem 1.75rem', borderRadius: '12px' }}
-            onClick={onEnterApp}
-          >
-            <span>Launch Hospital Portal</span>
-            <ArrowRight size={18} />
-          </button>
+          {user ? (
+            <>
+              <button
+                id="hero-btn-enter-app"
+                className="btn btn-primary"
+                style={{ fontSize: '1rem', padding: '0.85rem 1.75rem', borderRadius: '12px' }}
+                onClick={onEnterApp}
+              >
+                <span>Enter Hospital Workspace ({user.name})</span>
+                <ArrowRight size={18} />
+              </button>
 
-          <button
-            id="hero-btn-login"
-            className="btn btn-secondary"
-            style={{ fontSize: '1rem', padding: '0.85rem 1.75rem', borderRadius: '12px' }}
-            onClick={() => onOpenAuth('login')}
-          >
-            <Lock size={16} />
-            <span>Authorized Staff Sign In</span>
-          </button>
-        </div>
+              <button
+                id="hero-btn-logout"
+                className="btn btn-secondary"
+                style={{ fontSize: '1rem', padding: '0.85rem 1.5rem', borderRadius: '12px' }}
+                onClick={onLogout}
+              >
+                <span>Sign Out</span>
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                id="hero-btn-login"
+                className="btn btn-primary"
+                style={{ fontSize: '1rem', padding: '0.85rem 1.75rem', borderRadius: '12px' }}
+                onClick={() => onOpenAuth('login')}
+              >
+                <Lock size={16} />
+                <span>Authorized Staff Sign In</span>
+                <ArrowRight size={16} />
+              </button>
 
-        {/* Clinical Portals Access Bar */}
-        <div
-          style={{
-            background: '#ffffff',
-            border: '1px solid var(--border-subtle)',
-            borderRadius: '16px',
-            padding: '1.25rem',
-            boxShadow: 'var(--shadow-md)',
-            maxWidth: '940px',
-            margin: '0 auto',
-          }}
-        >
-          <div
-            style={{
-              fontSize: '0.75rem',
-              fontWeight: 800,
-              textTransform: 'uppercase',
-              color: 'var(--text-muted)',
-              marginBottom: '0.75rem',
-              letterSpacing: '0.05em',
-            }}
-          >
-            Departmental & Clinical Portals
-          </div>
-
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))',
-              gap: '0.75rem',
-            }}
-          >
-            <button
-              className="btn btn-secondary"
-              style={{ justifyContent: 'flex-start', padding: '0.7rem', textAlign: 'left' }}
-              onClick={() => onQuickDemo('super_admin')}
-            >
-              <Crown size={16} color="#d97706" />
-              <div>
-                <strong style={{ fontSize: '0.8125rem' }}>Executive Administration</strong>
-                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Practitioners & Roster Oversight</div>
-              </div>
-            </button>
-
-            <button
-              className="btn btn-secondary"
-              style={{ justifyContent: 'flex-start', padding: '0.7rem', textAlign: 'left' }}
-              onClick={() => onQuickDemo('admin')}
-            >
-              <Building size={16} color="#0284c7" />
-              <div>
-                <strong style={{ fontSize: '0.8125rem' }}>Clinical Front Desk</strong>
-                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Appointments & Patient Records</div>
-              </div>
-            </button>
-
-            <button
-              className="btn btn-secondary"
-              style={{ justifyContent: 'flex-start', padding: '0.7rem', textAlign: 'left' }}
-              onClick={() => onQuickDemo('doctor')}
-            >
-              <Stethoscope size={16} color="#0d9488" />
-              <div>
-                <strong style={{ fontSize: '0.8125rem' }}>Cardiology Department</strong>
-                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Dr. Eleanor Vance, MD</div>
-              </div>
-            </button>
-
-            <button
-              className="btn btn-secondary"
-              style={{ justifyContent: 'flex-start', padding: '0.7rem', textAlign: 'left' }}
-              onClick={() => onQuickDemo('doctor_temp')}
-            >
-              <UserCheck size={16} color="#475569" />
-              <div>
-                <strong style={{ fontSize: '0.8125rem' }}>Orthopedic Department</strong>
-                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Dr. Marcus Chen, MD</div>
-              </div>
-            </button>
-          </div>
+              <button
+                id="hero-btn-explore"
+                className="btn btn-secondary"
+                style={{ fontSize: '1rem', padding: '0.85rem 1.5rem', borderRadius: '12px' }}
+                onClick={() => {
+                  const el = document.getElementById('capabilities');
+                  if (el) el.scrollIntoView({ behavior: 'smooth' });
+                }}
+              >
+                <span>System Capabilities Overview</span>
+              </button>
+            </>
+          )}
         </div>
       </section>
 
       {/* Hospital Capabilities Section */}
-      <section style={{ maxWidth: '1280px', margin: '0 auto', padding: '3rem 2rem 5rem' }}>
+      <section id="capabilities" style={{ maxWidth: '1280px', margin: '0 auto', padding: '3rem 2rem 5rem' }}>
         <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
           <h2 style={{ fontSize: '2rem', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.02em' }}>
             Integrated Healthcare Operations

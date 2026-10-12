@@ -19,7 +19,7 @@ import { api } from './services/api';
 import { Calendar, Users } from 'lucide-react';
 
 function MainApplication() {
-  const { user, portalMode, setPortalMode, quickDemoLogin } = useAuth();
+  const { user, portalMode, setPortalMode, logout } = useAuth();
 
   // Navigation View: 'landing' | 'auth' | 'app'
   const [currentView, setCurrentView] = useState('landing');
@@ -216,25 +216,36 @@ function MainApplication() {
     }
   };
 
+  // Role-based portal sync
+  useEffect(() => {
+    if (user) {
+      if (user.role === 'DOCTOR' && portalMode !== 'DOCTOR') {
+        setPortalMode('DOCTOR');
+      } else if (user.role === 'ADMIN' && portalMode !== 'ADMIN') {
+        setPortalMode('ADMIN');
+      }
+    }
+  }, [user, portalMode, setPortalMode]);
+
   // View 1: Landing Page
   if (currentView === 'landing') {
     return (
       <>
         <LandingPage
-          onEnterApp={() => setCurrentView('app')}
+          onEnterApp={() => {
+            if (user) {
+              setCurrentView('app');
+            } else {
+              setAuthMode('login');
+              setCurrentView('auth');
+            }
+          }}
           onOpenAuth={(mode) => {
             setAuthMode(mode || 'login');
             setCurrentView('auth');
           }}
-          onQuickDemo={async (roleKey) => {
-            try {
-              await quickDemoLogin(roleKey);
-              setCurrentView('app');
-              addToast('Welcome! Logged in successfully.', 'success');
-            } catch (err) {
-              addToast(err.message || 'Demo login failed', 'error');
-            }
-          }}
+          user={user}
+          onLogout={logout}
           isDbConnected={true}
         />
         <Toast toasts={toasts} onDismiss={dismissToast} />
@@ -242,12 +253,29 @@ function MainApplication() {
     );
   }
 
-  // View 2: Dedicated Auth View (Login & Patient Registration)
+  // View 2: Dedicated Auth View (Login)
   if (currentView === 'auth') {
     return (
       <>
         <AuthView
           initialMode={authMode}
+          onBackToHome={() => setCurrentView('landing')}
+          onSuccess={() => {
+            setCurrentView('app');
+            addToast('Authenticated successfully!', 'success');
+          }}
+        />
+        <Toast toasts={toasts} onDismiss={dismissToast} />
+      </>
+    );
+  }
+
+  // Route Guard: Accessing 'app' view requires an authenticated session
+  if (!user) {
+    return (
+      <>
+        <AuthView
+          initialMode="login"
           onBackToHome={() => setCurrentView('landing')}
           onSuccess={() => {
             setCurrentView('app');
@@ -274,8 +302,8 @@ function MainApplication() {
 
       {/* Main Content Area */}
       <main className="main-content">
-        {/* PORTAL 1: SUPER ADMIN */}
-        {portalMode === 'SUPER_ADMIN' && (
+        {/* PORTAL 1: SUPER ADMIN (Authorized only for SUPER_ADMIN) */}
+        {portalMode === 'SUPER_ADMIN' && user?.role === 'SUPER_ADMIN' && (
           <SuperAdminPortal
             doctors={doctors}
             onRefreshDoctors={fetchMetadata}
@@ -283,13 +311,13 @@ function MainApplication() {
           />
         )}
 
-        {/* PORTAL 2: DOCTOR WORKSPACE */}
-        {portalMode === 'DOCTOR' && (
+        {/* PORTAL 2: DOCTOR WORKSPACE (Authorized only for DOCTOR) */}
+        {portalMode === 'DOCTOR' && user?.role === 'DOCTOR' && (
           <DoctorPortal onAddToast={addToast} />
         )}
 
-        {/* PORTAL 3: GENERAL ADMINISTRATION */}
-        {portalMode === 'ADMIN' && (
+        {/* PORTAL 3: GENERAL ADMINISTRATION (Authorized for ADMIN and SUPER_ADMIN) */}
+        {portalMode === 'ADMIN' && (user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN') && (
           <div>
             {/* Sudden Doctor Schedule Changes Alert Banner */}
             <AdminScheduleAlertsBanner
