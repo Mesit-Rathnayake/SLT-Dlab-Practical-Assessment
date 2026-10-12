@@ -9,13 +9,10 @@ import {
   Stethoscope,
   Building,
   Crown,
-  Database,
   Lock,
-  Sparkles,
   CheckCircle2,
-  AlertTriangle,
-  History,
-  FileText
+  FileText,
+  UserCheck
 } from 'lucide-react';
 
 export default function LandingPage({
@@ -76,7 +73,7 @@ export default function LandingPage({
             <div className="live-badge" title="Hospital Network Status">
               <span className="live-pulse" />
               <ShieldCheck size={14} color="#0d9488" />
-              <span>System Operational</span>
+              <span>Network Operational</span>
             </div>
 
             <button
@@ -94,7 +91,7 @@ export default function LandingPage({
               style={{ fontSize: '0.8125rem', padding: '0.5rem 1.15rem' }}
               onClick={onEnterApp}
             >
-              <span>Launch Clinical Portal</span>
+              <span>Enter Clinical Portal</span>
               <ArrowRight size={15} />
             </button>
           </div>
@@ -127,7 +124,7 @@ export default function LandingPage({
           }}
         >
           <Building size={15} />
-          <span>Integrated Healthcare System • NIC Patient Tracking</span>
+          <span>Integrated Healthcare Infrastructure</span>
         </div>
 
         <h1
@@ -141,20 +138,19 @@ export default function LandingPage({
             margin: '0 auto 1.25rem',
           }}
         >
-          Enterprise Clinical Appointments & Comprehensive Patient Records
+          Intelligent Clinical Workflow & Hospital Management
         </h1>
 
         <p
           style={{
             fontSize: 'clamp(1rem, 2vw, 1.2rem)',
             color: '#64748b',
-            maxWidth: '780px',
+            maxWidth: '820px',
             margin: '0 auto 2.5rem',
             lineHeight: 1.6,
           }}
         >
-          A unified, high-performance healthcare management platform built with <strong>React</strong>,{' '}
-          <strong>Go (Golang)</strong>, and secure relational database architecture. Features National Identity Card (NIC) patient tracking, complete consultation histories, verified practitioner rosters, and real-time emergency leave alerts.
+          Medical Wizard powers modern healthcare institutions with synchronized outpatient scheduling, unified patient records, practitioner roster coordination, and real-time clinical communication across all hospital departments.
         </p>
 
         {/* Hero CTAs */}
@@ -174,7 +170,7 @@ export default function LandingPage({
             style={{ fontSize: '1rem', padding: '0.85rem 1.75rem', borderRadius: '12px' }}
             onClick={onEnterApp}
           >
-            <span>Access Hospital System</span>
+            <span>Launch Hospital Portal</span>
             <ArrowRight size={18} />
           </button>
 
@@ -189,7 +185,7 @@ export default function LandingPage({
           </button>
         </div>
 
-        {/* Quick Reviewer 1-Click Launch Bar */}
+        {/* Clinical Portals Access Bar */}
         <div
           style={{
             background: '#ffffff',
@@ -197,7 +193,7 @@ export default function LandingPage({
             borderRadius: '16px',
             padding: '1.25rem',
             boxShadow: 'var(--shadow-md)',
-            maxWidth: '920px',
+            maxWidth: '940px',
             margin: '0 auto',
           }}
         >
@@ -211,80 +207,80 @@ export default function LandingPage({
               letterSpacing: '0.05em',
             }}
           >
-            ⚡ Hospital Staff Workspaces (1-Click Instant Login)
+            Departmental & Clinical Portals
           </div>
 
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))',
               gap: '0.75rem',
             }}
           >
             <button
               className="btn btn-secondary"
-              style={{ justifyContent: 'flex-start', padding: '0.65rem', textAlign: 'left' }}
+              style={{ justifyContent: 'flex-start', padding: '0.7rem', textAlign: 'left' }}
               onClick={() => onQuickDemo('super_admin')}
             >
               <Crown size={16} color="#d97706" />
               <div>
-                <strong style={{ fontSize: '0.8125rem' }}>Super Admin</strong>
-                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Doctor & Hours Mgmt</div>
+                <strong style={{ fontSize: '0.8125rem' }}>Executive Administration</strong>
+                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Practitioners & Roster Oversight</div>
               </div>
             </button>
 
             <button
               className="btn btn-secondary"
-              style={{ justifyContent: 'flex-start', padding: '0.65rem', textAlign: 'left' }}
+              style={{ justifyContent: 'flex-start', padding: '0.7rem', textAlign: 'left' }}
               onClick={() => onQuickDemo('admin')}
             >
               <Building size={16} color="#0284c7" />
               <div>
-                <strong style={{ fontSize: '0.8125rem' }}>General Administration</strong>
+                <strong style={{ fontSize: '0.8125rem' }}>Clinical Front Desk</strong>
                 <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Appointments & Patient Records</div>
               </div>
             </button>
 
             <button
               className="btn btn-secondary"
-              style={{ justifyContent: 'flex-start', padding: '0.65rem', textAlign: 'left' }}
+              style={{ justifyContent: 'flex-start', padding: '0.7rem', textAlign: 'left' }}
               onClick={() => onQuickDemo('doctor')}
             >
               <Stethoscope size={16} color="#0d9488" />
               <div>
-                <strong style={{ fontSize: '0.8125rem' }}>Dr. Vance (Cardiology)</strong>
-                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Consultation Queue & Status</div>
+                <strong style={{ fontSize: '0.8125rem' }}>Cardiology Department</strong>
+                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Dr. Eleanor Vance, MD</div>
               </div>
             </button>
 
             <button
               className="btn btn-secondary"
-              style={{ justifyContent: 'flex-start', padding: '0.65rem', textAlign: 'left' }}
+              style={{ justifyContent: 'flex-start', padding: '0.7rem', textAlign: 'left' }}
               onClick={() => onQuickDemo('doctor_temp')}
             >
-              <ShieldCheck size={16} color="#dc2626" />
+              <UserCheck size={16} color="#475569" />
               <div>
-                <strong style={{ fontSize: '0.8125rem' }}>Dr. Chen (Onboarding)</strong>
-                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Enforced Password Security</div>
+                <strong style={{ fontSize: '0.8125rem' }}>Orthopedic Department</strong>
+                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Dr. Marcus Chen, MD</div>
               </div>
             </button>
           </div>
         </div>
       </section>
 
-      {/* Feature Highlights Section */}
+      {/* Hospital Capabilities Section */}
       <section style={{ maxWidth: '1280px', margin: '0 auto', padding: '3rem 2rem 5rem' }}>
         <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
           <h2 style={{ fontSize: '2rem', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.02em' }}>
-            Built for High-Reliability Hospital Operations
+            Integrated Healthcare Operations
           </h2>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', maxWidth: '600px', margin: '0.5rem auto 0' }}>
-            Seamless integration between clinical staff, supervising administrators, and healthcare providers.
+            Designed for hospitals and multi-specialty medical centers requiring dependable operational coordination.
           </p>
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem' }}>
-          {/* Card 1: General Admin */}
+          {/* Card 1: Outpatient Care & Scheduling */}
           <div
             style={{
               background: '#ffffff',
@@ -311,24 +307,24 @@ export default function LandingPage({
             >
               <Building size={24} />
             </div>
-            <h3 style={{ fontSize: '1.25rem', fontWeight: 700 }}>General Administration Portal</h3>
+            <h3 style={{ fontSize: '1.25rem', fontWeight: 700 }}>Outpatient Care & Scheduling</h3>
             <p style={{ color: '#64748b', fontSize: '0.875rem', lineHeight: 1.6 }}>
-              Comprehensive appointment booking with National Identity Card (NIC) verification, complete previous medical consultation history tracking, and doctor emergency leave broadcast banners.
+              Deliver seamless patient encounters with conflict-free scheduling, automated clinician matching, and instantaneous access to patient care histories.
             </p>
             <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.5rem', fontSize: '0.8125rem', color: '#334155', padding: 0 }}>
               <li style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <CheckCircle2 size={16} color="#0d9488" /> NIC primary key verification & past visit history
+                <CheckCircle2 size={16} color="#0d9488" /> Real-time clinician availability & conflict prevention
               </li>
               <li style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <CheckCircle2 size={16} color="#0d9488" /> Real-time search across patients, doctors & notes
+                <CheckCircle2 size={16} color="#0d9488" /> Comprehensive longitudinal patient medical histories
               </li>
               <li style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <CheckCircle2 size={16} color="#0d9488" /> Instant sudden leave & schedule alert banner
+                <CheckCircle2 size={16} color="#0d9488" /> Instant administrative notice for clinical schedule updates
               </li>
             </ul>
           </div>
 
-          {/* Card 2: Super Admin */}
+          {/* Card 2: Practitioner Credentialing & Roster Governance */}
           <div
             style={{
               background: '#ffffff',
@@ -355,24 +351,24 @@ export default function LandingPage({
             >
               <Crown size={24} />
             </div>
-            <h3 style={{ fontSize: '1.25rem', fontWeight: 700 }}>Super Admin Portal</h3>
+            <h3 style={{ fontSize: '1.25rem', fontWeight: 700 }}>Practitioner Governance</h3>
             <p style={{ color: '#64748b', fontSize: '0.875rem', lineHeight: 1.6 }}>
-              Physician onboarding with Sri Lanka Medical Council (SLMC) registration verification, automated temporary credential issuance, recurring duty hours customizer, and full patient medical record access.
+              Streamline clinician credentialing, maintain verified medical council licensing, and configure multi-department duty schedules across hospital branches.
             </p>
             <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.5rem', fontSize: '0.8125rem', color: '#334155', padding: 0 }}>
               <li style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <CheckCircle2 size={16} color="#d97706" /> Practitioner onboarding with SLMC Reg No
+                <CheckCircle2 size={16} color="#d97706" /> Practitioner licensing verification & departmental assignment
               </li>
               <li style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <CheckCircle2 size={16} color="#d97706" /> Weekly schedule & slot duration customizer
+                <CheckCircle2 size={16} color="#d97706" /> Recurring shift management & consultation slot allocation
               </li>
               <li style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <CheckCircle2 size={16} color="#d97706" /> Patient registry with chronological histories
+                <CheckCircle2 size={16} color="#d97706" /> Secure institutional access control & credential dispatch
               </li>
             </ul>
           </div>
 
-          {/* Card 3: Doctor Portal */}
+          {/* Card 3: Clinician Consultation Suite */}
           <div
             style={{
               background: '#ffffff',
@@ -399,19 +395,19 @@ export default function LandingPage({
             >
               <Stethoscope size={24} />
             </div>
-            <h3 style={{ fontSize: '1.25rem', fontWeight: 700 }}>Personalized Doctor Portal</h3>
+            <h3 style={{ fontSize: '1.25rem', fontWeight: 700 }}>Clinician Workspace</h3>
             <p style={{ color: '#64748b', fontSize: '0.875rem', lineHeight: 1.6 }}>
-              Clinician consultation workspace showing daily patient appointments, inline visit progression (Start Consultation ➔ Mark Completed), duty schedule management, and emergency leave reporting.
+              Equip physicians with an intuitive clinical encounter suite designed for focused patient care, active status tracking, and direct administrative coordination.
             </p>
             <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.5rem', fontSize: '0.8125rem', color: '#334155', padding: 0 }}>
               <li style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <CheckCircle2 size={16} color="#0f766e" /> Dedicated consultation roster & patient history
+                <CheckCircle2 size={16} color="#0f766e" /> Real-time daily patient queue & clinical consultation notes
               </li>
               <li style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <CheckCircle2 size={16} color="#0f766e" /> Direct consultation status progression
+                <CheckCircle2 size={16} color="#0f766e" /> Seamless encounter lifecycle from triage to completion
               </li>
               <li style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <CheckCircle2 size={16} color="#0f766e" /> Broadcast sudden leaves/shifts to front desk
+                <CheckCircle2 size={16} color="#0f766e" /> Rapid shift adjustment & emergency clinical notice broadcasting
               </li>
             </ul>
           </div>
@@ -435,10 +431,10 @@ export default function LandingPage({
             <strong style={{ color: '#0f172a' }}>Medical Wizard Clinical Management System</strong>
           </div>
           <div>
-            Built with <strong>React</strong> • <strong>Go</strong> • <strong>PostgreSQL</strong>
+            Enterprise Healthcare Information Platform
           </div>
           <div>
-            Enterprise Hospital Information Platform
+            Secure Clinical Operations & Data Privacy Standards
           </div>
         </div>
       </footer>

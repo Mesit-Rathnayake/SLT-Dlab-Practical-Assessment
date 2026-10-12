@@ -203,7 +203,7 @@ export default function AuthView({ onBackToHome, onSuccess }) {
                 letterSpacing: '0.05em',
               }}
             >
-              ⚡ Authorized Workspaces (1-Click Instant Sign-In)
+              Institutional Portals & Role Access
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
               <button
@@ -215,8 +215,8 @@ export default function AuthView({ onBackToHome, onSuccess }) {
               >
                 <Crown size={15} color="#d97706" />
                 <div>
-                  <strong>Super Admin</strong>
-                  <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>Practitioners & Roster</div>
+                  <strong>Executive Admin</strong>
+                  <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>Practitioners & Facilities</div>
                 </div>
               </button>
 
@@ -229,8 +229,8 @@ export default function AuthView({ onBackToHome, onSuccess }) {
               >
                 <Building size={15} color="#0284c7" />
                 <div>
-                  <strong>General Admin</strong>
-                  <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>Appointments & Patients</div>
+                  <strong>Clinical Front Desk</strong>
+                  <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>Appointments & Admissions</div>
                 </div>
               </button>
 
@@ -243,8 +243,8 @@ export default function AuthView({ onBackToHome, onSuccess }) {
               >
                 <Stethoscope size={15} color="#0d9488" />
                 <div>
-                  <strong>Dr. Vance (Active)</strong>
-                  <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>Cardiologist Queue</div>
+                  <strong>Cardiology Clinic</strong>
+                  <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>Dr. Eleanor Vance, MD</div>
                 </div>
               </button>
 
@@ -255,10 +255,10 @@ export default function AuthView({ onBackToHome, onSuccess }) {
                 onClick={() => handleDemo('doctor_temp')}
                 disabled={loading}
               >
-                <ShieldCheck size={15} color="#dc2626" />
+                <User size={15} color="#475569" />
                 <div>
-                  <strong>Dr. Chen (Temp)</strong>
-                  <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>Enforced Security Reset</div>
+                  <strong>Orthopedic Surgery</strong>
+                  <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>Dr. Marcus Chen, MD</div>
                 </div>
               </button>
             </div>

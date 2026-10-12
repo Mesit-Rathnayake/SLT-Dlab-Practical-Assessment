@@ -6,41 +6,41 @@
 [![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?style=flat&logo=docker)](https://docker.com)
 [![RBAC](https://img.shields.io/badge/Security-JWT%20%2B%20RBAC-059669?style=flat)](https://jwt.io)
 
-An enterprise full-stack clinical appointment management system developed for the **AI Engineering Intern Practical Assessment**. 
+An enterprise full-stack clinical appointment management system designed for high-reliability hospital and outpatient clinic operations.
 
-The system incorporates **Role-Based Access Control (RBAC)**, three specialized workspaces (**General Administration**, **Super Admin Portal**, and **Doctor Portal**), SLMC registration verification, temporary credential dispatch with forced password rotation, and real-time sudden schedule change alert broadcasting.
+The system incorporates **Role-Based Access Control (RBAC)** across specialized operational workspaces (**General Administration & Admissions**, **Super Admin Governance**, and **Doctor Clinical Suite**), National Identity Card (NIC) patient tracking, SLMC registration verification, temporary credential dispatch with forced password rotation, and real-time sudden schedule change alert broadcasting.
 
 ---
 
 ## Table of Contents
-1. [Core Features & Assessment Matrix](#core-features--assessment-matrix)
+1. [Core Platform Capabilities](#core-platform-capabilities)
 2. [Multi-Portal System & RBAC Architecture](#multi-portal-system--rbac-architecture)
-3. [Credentials for Evaluation & Testing](#credentials-for-evaluation--testing)
+3. [Credentials & Access Directory](#credentials--access-directory)
 4. [Relational Database Architecture](#relational-database-architecture)
 5. [Backend & Security Architecture (Go)](#backend--security-architecture-go)
 6. [Frontend Architecture (React + Vite)](#frontend-architecture-react--vite)
-7. [AI Usage & Engineering Review Log](#ai-usage--engineering-review-log)
-8. [Getting Started (Local Execution)](#getting-started-local-execution)
-9. [Connecting to Neon Serverless Cloud PostgreSQL](#connecting-to-neon-serverless-cloud-postgresql)
-10. [Automated Testing](#automated-testing)
-11. [Cloud Deployment Strategy](#cloud-deployment-strategy)
-12. [API Specification](#api-specification)
+7. [Getting Started (Local Execution)](#getting-started-local-execution)
+8. [Connecting to Neon Serverless Cloud PostgreSQL](#connecting-to-neon-serverless-cloud-postgresql)
+9. [Automated Testing](#automated-testing)
+10. [Cloud Deployment Strategy](#cloud-deployment-strategy)
+11. [API Specification](#api-specification)
 
 ---
 
-## 1. Core Features & Assessment Matrix
+## 1. Core Platform Capabilities
 
-| Feature | Assessment Requirement | Implementation Details |
+| Module | Operational Capability | Implementation Details |
 | :--- | :--- | :--- |
-| **Create Appointment** | Create an appointment | Relational form linking patient, provider, visit type, duration, and clinical notes. Includes **doctor double-booking prevention** and inline new-patient registration. |
-| **View Appointments** | View appointments | High-density data table with patient avatars, clinician specialties, clinic room numbers, formatted timestamps, visit categories, and status badges. |
-| **Edit Appointment** | Edit an appointment | Full appointment editor dialog and instant inline status changer directly from each table row. |
-| **Delete Appointment** | Delete an appointment | Safe deletion workflow with interactive confirmation modal and immediate table & KPI update. |
-| **Search & Filter** | Search or filter appointments | Real-time debounced full-text search across patients, doctors, and notes; status pill tabs with live counters; provider & type dropdowns; multi-column sorting. |
-| **Super Admin Portal** | Enhanced requirement | Onboards medical practitioners with **SLMC Registration Numbers**, issues auto-generated temporary passwords, sets recurring weekly working hours, and audits welcome emails. |
-| **Doctor Portal** | Enhanced requirement | Dedicated workspace for clinicians to review their consultations, advance visit states (Start $\to$ Completed), manage duty hours, and broadcast sudden emergency leaves. |
-| **Sudden Change Alerts** | Enhanced requirement | When a doctor submits emergency leave or adjusted clinic hours, a prominent alert banner broadcasts immediately to the General Administration. |
-| **Auth & Temp Passwords**| Enhanced requirement | JWT authentication, bcrypt password hashing, and enforced first-time password rotation (`must_change_password`). |
+| **Outpatient Scheduling** | Appointment Lifecycle | Relational form linking patient, provider, visit type, duration, and clinical notes. Includes **clinician conflict prevention** and inline new-patient registration. |
+| **Directory & Queue** | Centralized Directory | High-density data table with patient avatars, clinician specialties, clinic room numbers, formatted timestamps, visit categories, and status badges. |
+| **Patient Care History** | Longitudinal Records | Instant retrieval of all previous consultations linked to patient **National Identity Card (NIC)** number. |
+| **Encounter Modification**| Appointment Editor | Full encounter editor dialog and instant inline status changer directly from each table row. |
+| **Cancellation & Deletion**| Safe Cancellation | Safe deletion workflow with interactive confirmation modal and immediate table & KPI update. |
+| **Search & Discovery** | Multi-Criteria Filtering | Real-time debounced full-text search across patients, doctors, and notes; status pill tabs with live counters; provider & type dropdowns; multi-column sorting. |
+| **Executive Governance** | Clinician Credentialing | Onboards medical practitioners with **SLMC Registration Numbers**, issues auto-generated temporary passwords, sets recurring weekly working hours, and audits welcome emails. |
+| **Doctor Workspace** | Consultation Encounter Suite | Dedicated workspace for clinicians to review their consultations, advance visit states (Start $\to$ Completed), manage duty hours, and broadcast sudden emergency leaves. |
+| **Clinical Alerts** | Emergency Leave Broadcasting | When a doctor submits emergency leave or adjusted clinic hours, a prominent alert banner broadcasts immediately to General Administration. |
+| **Security & Auth** | RBAC & Cryptographic Tokens | JWT authentication, bcrypt password hashing, and enforced first-time password rotation (`must_change_password`). |
 
 ---
 
